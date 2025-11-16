@@ -8,18 +8,77 @@ import time, random  # <— nach oben geholt
 
 st.set_page_config(page_title="AI-Chatbot", page_icon="💬")
 
-st.markdown(
-    """
-    <div style="text-align:center; margin-bottom:0.5rem;">
-      <h1 style="margin-bottom:0.2rem;">🏨 Hotel-Service Chat</h1>
-      <p style="margin-top:0; color:#666;">Schnelle Hilfe beim Check-in, Zimmer & mehr mit unserem KI-Chatbot</p>
-      <span style="display:inline-block; padding:4px 10px; border-radius:999px; background:#e8f5e9; color:#2e7d32; font-size:12px;">
-        Rezeption heute: 07:00–23:00
-      </span>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# ——— Globales CSS: Hintergründe, Breite, Kartenoptik, Fonts ———
+st.markdown("""
+<style>
+/* Optional: Google Font (für feineres Schriftbild) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+html, body, [data-testid="stAppViewContainer"] * { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+
+/* Gesamt-Hintergrund mit sanftem Verlauf */
+[data-testid="stAppViewContainer"] {
+  background: radial-gradient(1200px 500px at 20% -10%, #E8F1FF 0%, rgba(232,241,255,0) 60%),
+              radial-gradient(900px 400px at 90% 0%, #F7E9FF 0%, rgba(247,233,255,0) 55%),
+              #F7F9FC;
+}
+
+/* Hauptbreite und zentrierte Bühne */
+section.main > div {
+  max-width: 880px !important;    /* Bühne für Content */
+  margin: 0 auto !important;
+  padding-top: 1rem !important;
+}
+
+/* Header-Block (dein Branding oben) etwas kompakter */
+h1, h2, h3 { letter-spacing: 0.2px; margin-top: 0.2rem; }
+
+/* Chatkarten (Streamlit chat messages) aufwerten */
+div[data-testid="stChatMessage"] {
+  background: var(--background-color, #FFFFFF);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 16px;
+  padding: 0.75rem 0.9rem;
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.04);
+  margin-bottom: 0.6rem;
+}
+
+/* User vs. Assistant subtil unterscheiden */
+div[data-testid="stChatMessage"] p { margin: 0.1rem 0; line-height: 1.5; }
+div[data-testid="stChatMessage"]:has(img[alt="🧑"]) { background: #F3F6FB; }        /* User */
+div[data-testid="stChatMessage"]:has(img[alt="🏨"]) { background: #FFFFFF; }        /* Hotel */
+
+/* Chat-Input-Leiste etwas luftiger */
+div[data-testid="stChatInput"] textarea {
+  border-radius: 12px !important;
+  border: 1px solid rgba(15,23,42,0.12) !important;
+}
+
+/* Buttons runder & dezente Hover-States */
+button[kind="primary"] {
+  border-radius: 999px !important;
+  box-shadow: 0 4px 14px rgba(30,136,229,.18) !important;
+}
+button:hover { filter: brightness(0.98); }
+
+/* Trennlinie dezenter */
+hr { border: none; border-top: 1px solid rgba(15,23,42,0.08); margin: 1rem 0; }
+</style>
+""", unsafe_allow_html=True)
+
+
+st.markdown("""
+<div style="background:#ffffff;border:1px solid rgba(15,23,42,0.06);border-radius:16px;
+            padding:18px 22px;box-shadow:0 8px 24px rgba(2,6,23,0.04);margin-bottom:12px;text-align:center;">
+  <h1 style="margin:0 0 6px 0;">🏨 Hotel-Service Chat</h1>
+  <p style="margin:0;color:#475569;">Schnelle Hilfe beim Check-in, Zimmer &amp; mehr mit unserem KI-Chatbot</p>
+  <div style="margin-top:10px;">
+    <span style="display:inline-block;padding:6px 12px;border-radius:999px;background:#E8F5E9;color:#2E7D32;font-size:12px;">
+      Rezeption heute: 07:00–23:00
+    </span>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
 
 @st.cache_resource
 def load_kb(csv_path="answers.csv"):
@@ -96,7 +155,7 @@ if user_msg:
         picked_id = best["id"]
 
     # Realistische Tipp-Animation + Ausgabe (JETZT liegt bot_text vor!)
-    with st.chat_message("assistant", avatar="🏨"):
+    with st.chat_message("assistant"):
         dots = st.empty()
         for i in range(3):
             dots.markdown(f"_schreibt{'.' * ((i % 3) + 1)}_")
