@@ -83,7 +83,7 @@ st.markdown("""
        width="70" style="border-radius:50%;margin-bottom:10px;" alt="Hotel Logo">
   <h1 style="margin-bottom:0;">🏨 Hotel Bellevue Grand</h1>
   <p style="margin-top:6px;margin-bottom:8px;color:#475569;font-size:16px;">
-    Ihr persönlicher digitaler Concierge – 24 Stunden für Sie da
+    Ihr AI-Chatbot – 24 Stunden für Sie da
   </p>
   <div style="margin-top:10px;">
     <span style="display:inline-block;padding:6px 14px;border-radius:999px;
@@ -95,7 +95,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Zusätzlicher Seitentitel (optional)
-st.markdown('<h1 style="text-align:center;margin-top:0;">Digitaler Concierge</h1>', unsafe_allow_html=True)
+st.markdown('<h1 style="text-align:center;margin-top:0;">AI-Chatbot</h1>', unsafe_allow_html=True)
 
 # Bild zentriert (optional – passe Dateinamen/Ordner an)
 center_col = st.columns([2, 2, 2])[1]
@@ -152,7 +152,7 @@ def type_out(text: str):
     dots = st.empty()
     for i in range(3):
         dots.markdown(f"<span style='opacity:.75;'><em>schreibt{'.' * (i % 3 + 1)}</em></span>", unsafe_allow_html=True)
-        time.sleep(0.30)
+        time.sleep(0.50)
     dots.empty()
 
     # eigentliche Ausgabe in dynamischem Platzhalter
