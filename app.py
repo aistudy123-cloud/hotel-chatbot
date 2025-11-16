@@ -113,11 +113,26 @@ if user_msg:
         bot_text = best["answer"]
         picked_id = best["id"]
 
-    import time
-    with st.chat_message("assistant"):
-        placeholder = st.empty()
-        placeholder.markdown("_schreibt…_")
-        time.sleep(0.6)  # mini-Delay für Realismus
+
+import time, random
+
+with st.chat_message("assistant", avatar="🏨"):
+    dots = st.empty()
+    for i in range(3):
+        dots.markdown(f"_schreibt{'.' * ((i % 3) + 1)}_")
+        time.sleep(0.35)
+    dots.empty()
+
+    output = st.empty()
+    displayed = ""
+    typing_speed = random.uniform(0.01, 0.03)  # leicht variierende Tippgeschwindigkeit
+    for ch in bot_text:
+        displayed += ch
+        output.markdown(displayed)
+        time.sleep(typing_speed)
+
+    
+
 
     with st.chat_message("assistant"):
         st.write(bot_text)
