@@ -79,18 +79,11 @@ st.markdown("""
     margin-bottom:18px;
     box-shadow:0 8px 30px rgba(2,6,23,0.05);
     text-align:center;">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"
-       width="70" style="border-radius:50%;margin-bottom:10px;" alt="Hotel Logo">
   <h1 style="margin-bottom:0;">🏨 Hotel Bellevue Grand</h1>
   <p style="margin-top:6px;margin-bottom:8px;color:#475569;font-size:16px;">
     Ihr AI-Chatbot – 24 Stunden für Sie da
   </p>
-  <div style="margin-top:10px;">
-    <span style="display:inline-block;padding:6px 14px;border-radius:999px;
-      background:#E8F5E9;color:#2E7D32;font-size:13px;">
-      Rezeption heute geöffnet – 07:00–23:00 Uhr
-    </span>
-  </div>
+
 </div>
 """, unsafe_allow_html=True)
 
