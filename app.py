@@ -13,6 +13,7 @@ st.markdown(
     <div style="text-align:center; margin-bottom:0.5rem;">
       <h1 style="margin-bottom:0.2rem;">🏨 Hotel Bellevue Grand</h1>
       <p style="margin-top:0; color:#666;">Schnelle Hilfe beim Check-in, Zimmer & mehr mit unserem KI-Chatbot</p>
+
     </div>
     """,
     unsafe_allow_html=True
@@ -56,10 +57,14 @@ center_col = st.columns([2, 2, 2])[1]
 with center_col:
     st.image("AI-Chatbot.png", width=200)
 
-# Knowledge Base laden & State initialisieren
 df, vec, X = load_kb("answers.csv")
 if "history" not in st.session_state:
     st.session_state.history = []
+
+# Button zum Löschen des bisherigen Chatverlaufs
+if st.button("🧹 Neue Unterhaltung starten"):
+    st.session_state.history = []
+    st.rerun()
 
 # Willkommensnachricht nur wenn keine Historie
 if not st.session_state.history:
@@ -71,24 +76,9 @@ for role, text in st.session_state.history:
     with st.chat_message(role):
         st.write(text)
 
-# ---------------------------
-# Eigenen Composer + Reset unten
-# ---------------------------
-st.markdown("---")
-
-with st.form("composer", clear_on_submit=True):
-    user_msg = st.text_input("Frag mich etwas …", key="composer_input")
-    send = st.form_submit_button("Senden ✉️")
-
-# Reset-Button UNTER dem Eingabefeld
-reset_clicked = st.button("🧹 Neue Unterhaltung starten")
-
-if reset_clicked:
-    st.session_state.history = []
-    st.rerun()
-
-# Senden-Logik
-if send and user_msg:
+# Eingabefeld unten
+user_msg = st.chat_input("Frag mich etwas …")
+if user_msg:
     # Nutzer-Nachricht anzeigen + speichern
     st.session_state.history.append(("user", user_msg))
     with st.chat_message("user"):
@@ -103,7 +93,7 @@ if send and user_msg:
         bot_text = best["answer"]
         picked_id = best["id"]
 
-    # Tipp-Animation + Ausgabe
+    # Realistische Tipp-Animation + Ausgabe (JETZT liegt bot_text vor!)
     with st.chat_message("assistant", avatar="🏨"):
         dots = st.empty()
         for i in range(3):
@@ -118,7 +108,7 @@ if send and user_msg:
             output.markdown(displayed)
             time.sleep(random.uniform(0.01, 0.03))
 
-    # Bot-Antwort im Verlauf speichern
+    # Bot-Antwort im Verlauf speichern (damit sie nach Rerun bleibt)
     st.session_state.history.append(("assistant", bot_text))
 
     # Logging
