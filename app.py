@@ -53,9 +53,9 @@ def log_event(user_text, picked_id, sim, logfile="logs.csv"):
 st.markdown('<h2 style="text-align:center;">KI-Chatbot</h2>', unsafe_allow_html=True)
 
 # Bild zentriert
-center_col = st.columns([2, 2, 2])[1]
+center_col = st.columns([3, 3, 3])[1]
 with center_col:
-    st.image("AI-Chatbot.png", width=150)
+    st.image("AI-Chatbot.png", width=140)
 
 df, vec, X = load_kb("answers.csv")
 if "history" not in st.session_state:
