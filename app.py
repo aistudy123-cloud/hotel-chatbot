@@ -4,108 +4,80 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime
 import os
-import time, random  # <— nach oben geholt
+import time, random
 
 st.set_page_config(page_title="KI-Chatbot", page_icon="💬")
 
-# ====== THEME / STYLES ======
+# ====== THEME / STYLES (inkl. Fix gegen weiße Balken) ======
 st.markdown("""
 <style>
-/* App-Hintergrund & zentrierte Chatkarte */
-[data-testid="stAppViewContainer"] {
-  background: #f4f6fb; /* leichtes Grau-Blau */
-}
+/* --- Globale Container-Abstände minimieren --- */
+.block-container { padding-top: 1rem; padding-bottom: 0rem; }
+div[data-testid="stVerticalBlock"]         { gap: 0 !important; }
+div[data-testid="stVerticalBlock"] > div   { margin: 0 !important; padding: 0 !important; }
+div[data-testid="stHorizontalBlock"]       { gap: 0 !important; }
+hr, div[data-testid="stDivider"]           { display: none !important; }
+
+/* --- App-Hintergrund & zentrierte Chatkarte --- */
+[data-testid="stAppViewContainer"] { background: #f4f6fb; }
 .chat-shell {
-  max-width: 840px;
-  margin: 2rem auto;
-  border-radius: 16px;
-  box-shadow: 0 6px 18px rgba(0,0,0,.08);
-  overflow: hidden;
-  background: #fff;
-  border: 1px solid #e9eef5;
+  max-width: 840px; margin: 1.2rem auto;
+  border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  overflow: hidden; background: #fff; border: 1px solid #e9eef5;
 }
 
-/* Header-Leiste (Hotel-Style) */
+/* --- Header-Leiste (Hotel-Stil) --- */
 .chat-header {
   display: flex; align-items: center; gap: 12px;
-  background: #003a6d; /* Marineblau */
-  color: #fff; padding: 12px 16px;
+  background: #003a6d; color: #fff; padding: 12px 16px;
 }
-.chat-header .title {
-  font-weight: 600; letter-spacing: .2px;
-}
-.chat-header .subtitle {
-  opacity: .85; font-size: .9rem;
-}
+.chat-header .title   { font-weight: 600; letter-spacing: .2px; }
+.chat-header .subtitle{ opacity: .85; font-size: .9rem; }
 
-/* Chat-Content-Bereich */
+/* --- Chat-Content --- */
 .chat-body {
-  padding: 16px; 
+  padding: 12px 16px;
   background: linear-gradient(180deg,#ffffff 0%,#ffffff 65%, #fafbfe 100%);
 }
 
-/* Bubbles */
-.chat-row {
-  display: flex; margin: 8px 0;
-}
-.chat-row.bot { justify-content: flex-start; }
+/* --- Reihen & Bubbles --- */
+.chat-row { display: flex; margin: 4px 0 !important; }  /* <- kleine, feste Abstände */
+.chat-row.bot  { justify-content: flex-start; }
 .chat-row.user { justify-content: flex-end; }
 
 .bubble {
-  max-width: 78%;
-  padding: 10px 14px;
-  border-radius: 16px;
-  word-wrap: break-word;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  max-width: 78%; padding: 10px 14px; border-radius: 16px;
+  word-wrap: break-word; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
   position: relative;
 }
 .bubble.bot {
-  background: #fff7e6;               /* sanftes Gold/Beige */
-  border: 1px solid #f3e2be;
-  border-bottom-left-radius: 6px;
+  background: #fff7e6; border: 1px solid #f3e2be; border-bottom-left-radius: 6px;
 }
 .bubble.user {
-  background: #e8f0fe;               /* sanftes Blau */
-  border: 1px solid #cfdaf7;
-  border-bottom-right-radius: 6px;
+  background: #e8f0fe; border: 1px solid #cfdaf7; border-bottom-right-radius: 6px;
 }
 
-/* Avatar-Kapseln */
+/* --- Avatare --- */
 .avatar {
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 50%;
-  box-shadow: 0 1px 3px rgba(0,0,0,.15);
-  font-size: 18px;
+  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,.15); font-size: 18px;
 }
-.avatar.bot { background: #ffecb3; color: #5a4800; margin-right: 8px; }
+.avatar.bot  { background: #ffecb3; color: #5a4800; margin-right: 8px; }
 .avatar.user { background: #dbe6ff; color: #0b3b8c; margin-left: 8px; }
 
-/* „Tippt…“ Inline-Status */
-.typing {
-  font-style: italic; color: #7a889b; font-size: .9rem; margin: 4px 0 0 40px;
-}
-
-/* Fußbereich (Input sitzt weiterhin unten per Streamlit) */
-.chat-footer {
-  padding: 10px 16px 4px 16px; border-top: 1px solid #eef2f7; background: #fff;
-}
-
-/* Chat-Input optisch aufwerten */
+/* --- Footer/Chat-Input optisch --- */
+.chat-footer { padding: 6px 16px 4px 16px; border-top: 1px solid #eef2f7; background: #fff; }
 div[data-testid="stChatInputContainer"] textarea {
-  border: 1px solid #cdd7e3 !important;
-  border-radius: 12px !important;
+  border: 1px solid #cdd7e3 !important; border-radius: 12px !important;
   transition: box-shadow .15s ease, border-color .15s ease;
 }
 div[data-testid="stChatInputContainer"] textarea:focus {
-  border-color: #4179c8 !important;
-  box-shadow: 0 0 0 3px rgba(65,121,200,.18) !important;
+  border-color: #4179c8 !important; box-shadow: 0 0 0 3px rgba(65,121,200,.18) !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ====== TOP-Branding (optional zusätzlich zur Header-Leiste) ======
-# Kannst du entfernen, wenn du nur die Header-Leiste willst.
+# ====== (Optional) oberes Intro beibehalten ======
 st.markdown(
     """
     <div style="text-align:center; margin-bottom:0.5rem;">
@@ -146,11 +118,11 @@ def log_event(user_text, picked_id, sim, logfile="logs.csv"):
     exists = os.path.exists(logfile)
     pd.DataFrame([row]).to_csv(logfile, mode="a", index=False, header=not exists)
 
-# ====== SHELL START ======
+# ====== SHELL ======
 st.markdown('<div class="chat-shell">', unsafe_allow_html=True)
 
 # Header-Leiste
-st.markdown(f"""
+st.markdown("""
 <div class="chat-header">
   <div class="avatar bot">🏨</div>
   <div>
@@ -160,25 +132,21 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# Chat-Body begin
+# Chat-Body
 st.markdown('<div class="chat-body">', unsafe_allow_html=True)
-
-# (Optional) Logo innerhalb der Karte – wenn gewünscht:
-# st.image("AI-Chatbot.png", width=44)
 
 df, vec, X = load_kb("answers.csv")
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Reset-Button (beibehält deine Logik)
+# Reset (bleibt oben in der Karte – ohne weißen Balken)
 if st.button("🧹 Neue Unterhaltung starten"):
     st.session_state.history = []
     st.rerun()
 
-# Helper zum Rendern einer Zeile als Bubble + Avatar
+# Helper: Bubble-Renderer
 def render_bubble(role, text):
-    # Escape basic HTML risiken minimal – hier simple Replace; für volle Sicherheit markdown benutzen.
-    safe_text = text
+    safe_text = text  # ggf. markdown.escape nutzen, wenn du HTML im Text verhindern willst
     if role == "user":
         st.markdown(f"""
         <div class="chat-row user">
@@ -194,24 +162,22 @@ def render_bubble(role, text):
         </div>
         """, unsafe_allow_html=True)
 
-# Welcome nur ohne Historie
+# Welcome
 if not st.session_state.history:
     render_bubble("assistant", "Willkommen im Hotel! Wie kann ich helfen?")
 
-# Vergangene Nachrichten als Bubbles
+# Historie
 for role, text in st.session_state.history:
     render_bubble(role, text)
 
-# ====== Chat-Input unten (Streamlit-Standard) ======
+# Body zu – Footer optisch vor dem Input
 st.markdown('</div>', unsafe_allow_html=True)  # /chat-body
-
-# Optional: dünner Divider vor Input
 st.markdown('<div class="chat-footer"></div>', unsafe_allow_html=True)
 
+# Chat-Input
 user_msg = st.chat_input("Frag mich etwas …")
-
 if user_msg:
-    # User-Bubble sofort rendern + speichern
+    # User anzeigen + speichern
     st.session_state.history.append(("user", user_msg))
     render_bubble("user", user_msg)
 
@@ -221,11 +187,9 @@ if user_msg:
         bot_text = "Da bin ich unsicher. Meinst du Check-in, Parkplatz oder WLAN?"
         picked_id = ""
     else:
-        bot_text = best["answer"]
-        picked_id = best["id"]
+        bot_text = best["answer"]; picked_id = best["id"]
 
-    # Tipp-Animation (im Bubble-Stil)
-    # Wir zeigen kurz „… schreibt“ und ersetzen es anschließend durch die echte Antwort.
+    # Tipp-Animation (Bubble-Placeholder)
     ph = st.empty()
     ph.markdown("""
     <div class="chat-row bot">
@@ -233,12 +197,10 @@ if user_msg:
       <div class="bubble bot"><em>schreibt…</em></div>
     </div>
     """, unsafe_allow_html=True)
-    # Längenabhängige Wartezeit
     time.sleep(min(1.2, max(0.4, len(bot_text) * 0.01)))
     ph.empty()
 
-    # „Typing“-Effekt Zeichen für Zeichen (im Bot-Bubble)
-    # Hinweis: Für sehr lange Antworten ggf. auf Chunking umstellen.
+    # Typing-Effekt
     container = st.empty()
     displayed = ""
     for ch in bot_text:
@@ -251,10 +213,8 @@ if user_msg:
         """, unsafe_allow_html=True)
         time.sleep(random.uniform(0.005, 0.02))
 
-    # Final speichern
+    # Speichern & Loggen
     st.session_state.history.append(("assistant", bot_text))
-
-    # Logging
     log_event(user_msg, picked_id, sim if best is not None else 0.0)
 
 st.markdown('</div>', unsafe_allow_html=True)  # /chat-shell
