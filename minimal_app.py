@@ -4,7 +4,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime
 import os
-import time, random  # <— nach oben geholt
+import time, random
 
 st.set_page_config(page_title="KI-Chatbot", page_icon="💬", layout="wide")
 
@@ -21,11 +21,46 @@ with header_col_c:
         unsafe_allow_html=True
     )
 with header_col_r:
-    # Button rechts oben
     if st.button("🧹 Neue Unterhaltung starten", key="btn_reset_top"):
         st.session_state.history = []
         st.rerun()
 
+# ——— Fixiertes Seiten-Panel rechts mit „KI-Chatbot“ und Bild ———
+st.markdown(
+    """
+    <style>
+      .fixed-sidebox {
+        position: fixed;
+        top: 120px;
+        right: 40px;
+        width: 200px;
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 16px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        text-align: center;
+        padding: 15px;
+        z-index: 1000;
+      }
+      .fixed-sidebox h3 {
+        margin-top: 10px;
+        color: #333;
+      }
+      .fixed-sidebox img {
+        width: 80px;
+        border-radius: 50%;
+        margin-top: 5px;
+      }
+    </style>
+    <div class="fixed-sidebox">
+        <img src="AI-Chatbot.png" alt="Chatbot Logo">
+        <h3>KI-Chatbot</h3>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# ——— Laden der Datenbank ———
 @st.cache_resource
 def load_kb(csv_path="answers.csv"):
     df = pd.read_csv(csv_path).fillna("")
@@ -56,14 +91,6 @@ def log_event(user_text, picked_id, sim, logfile="logs.csv"):
     exists = os.path.exists(logfile)
     pd.DataFrame([row]).to_csv(logfile, mode="a", index=False, header=not exists)
 
-# Optionaler Untertitel mittig
-st.markdown('<h2 style="text-align:center;">KI-Chatbot</h2>', unsafe_allow_html=True)
-
-# Bild zentriert
-center_col = st.columns([3, 2, 3])[1]
-with center_col:
-    st.image("AI-Chatbot.png", width=140)
-
 df, vec, X = load_kb("answers.csv")
 if "history" not in st.session_state:
     st.session_state.history = []
@@ -81,12 +108,10 @@ for role, text in st.session_state.history:
 # Eingabefeld unten
 user_msg = st.chat_input("Frag mich etwas …")
 if user_msg:
-    # Nutzer-Nachricht anzeigen + speichern
     st.session_state.history.append(("user", user_msg))
     with st.chat_message("user"):
         st.write(user_msg)
 
-    # Antwort bestimmen
     best, sim, top = find_best_answer(user_msg, df, vec, X, threshold=0.20, topk=3)
     if best is None:
         bot_text = "Dazu kann ich dir leider nicht weiterhelfen."
@@ -95,7 +120,6 @@ if user_msg:
         bot_text = best["answer"]
         picked_id = best["id"]
 
-    # Realistische Tipp-Animation + Ausgabe
     with st.chat_message("assistant"):
         dots = st.empty()
         for i in range(3):
@@ -110,9 +134,5 @@ if user_msg:
             output.markdown(displayed)
             time.sleep(random.uniform(0.01, 0.03))
 
-    # Bot-Antwort im Verlauf speichern
     st.session_state.history.append(("assistant", bot_text))
-
-    # Logging
     log_event(user_msg, picked_id, sim if best is not None else 0.0)
-
