@@ -5,7 +5,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime
 import os, time, random
 
-st.set_page_config(page_title="KI-Chatbot", page_icon="💬", layout="wide")
+st.set_page_config(page_title="KI-Chatbot", page_icon="💬")
 
 # ——— Kopfbereich mit Titel + Button rechts oben ———
 header_col_l, header_col_c, header_col_r = st.columns([1, 3, 1])
