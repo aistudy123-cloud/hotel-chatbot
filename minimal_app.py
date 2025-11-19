@@ -3,10 +3,20 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime
-import os
+import os, base64
 import time, random
 
 st.set_page_config(page_title="KI-Chatbot", page_icon="💬", layout="wide")
+
+# —— Logo als Base64 einbetten (robust, unabhängig vom Pfad im <img>) ——
+LOGO_PATH = "/mnt/data/8faa0e4f-b7db-4499-8ce6-2c4895491d2d.png"
+def encode_image(path):
+    try:
+        with open(path, "rb") as f:
+            return base64.b64encode(f.read()).decode("utf-8")
+    except Exception:
+        return ""  # Fallback: kein Bild
+LOGO_B64 = encode_image(LOGO_PATH)
 
 # ——— Kopfbereich mit Titel + Button rechts oben ———
 header_col_l, header_col_c, header_col_r = st.columns([1, 3, 1])
@@ -26,6 +36,9 @@ with header_col_r:
         st.rerun()
 
 # ——— Fixiertes Seiten-Panel rechts mit „KI-Chatbot“ und Bild ———
+# Falls das Bild nicht geladen werden kann, wird nur die Überschrift angezeigt.
+img_tag = f'<img src="data:image/png;base64,{LOGO_B64}" alt="Chatbot Logo">' if LOGO_B64 else ""
+
 st.markdown(
     f"""
     <style>
@@ -60,7 +73,7 @@ st.markdown(
       }}
     </style>
     <div class="fixed-sidebox">
-        <img src="/mnt/data/6b501425-a910-4b80-a33e-a25ca6e85123.png" alt="Chatbot Logo">
+        {img_tag}
         <h3>KI-Chatbot</h3>
     </div>
     """,
