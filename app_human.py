@@ -50,7 +50,7 @@ def log_event(user_text, picked_id, sim, logfile="logs.csv"):
     pd.DataFrame([row]).to_csv(logfile, mode="a", index=False, header=not exists)
 
 # Titel mittig (per HTML)
-st.markdown('<h2 style="text-align:center;">KI-Chatbot</h2>', unsafe_allow_html=True)
+st.markdown('<h2 style="text-align:center;">Mitarbeiter-Chat</h2>', unsafe_allow_html=True)
 
 # Bild zentriert
 center_col = st.columns([3, 2, 3])[1]
@@ -85,7 +85,7 @@ if user_msg:
         st.write(user_msg)
 
     # Antwort bestimmen
-    best, sim, top = find_best_answer(user_msg, df, vec, X, threshold=0.25, topk=3)
+    best, sim, top = find_best_answer(user_msg, df, vec, X, threshold=0.20, topk=3)
     if best is None:
         bot_text = "Dazu kann ich dir leider nicht weiterhelfen."
         picked_id = ""

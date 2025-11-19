@@ -85,7 +85,7 @@ if user_msg:
         st.write(user_msg)
 
     # Antwort bestimmen
-    best, sim, top = find_best_answer(user_msg, df, vec, X, threshold=0.25, topk=3)
+    best, sim, top = find_best_answer(user_msg, df, vec, X, threshold=0.20, topk=3)
     if best is None:
         bot_text = "Dazu kann ich dir leider nicht weiterhelfen."
         picked_id = ""
