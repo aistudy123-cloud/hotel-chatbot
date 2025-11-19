@@ -3,20 +3,28 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime
-import os, time, random
+import os, base64, time, random
 
 st.set_page_config(page_title="KI-Chatbot", page_icon="💬")
 
-# ——— Kopfbereich mit Titel + Button rechts oben ———
+# ---- Logo laden & als Base64 einbetten (vermeidet Pfad-/Serving-Probleme) ----
+LOGO_PATH = "/mnt/data/87ad994e-833e-4bd5-b88f-ff6781e1f746.png"
+def to_b64(path: str) -> str:
+    try:
+        with open(path, "rb") as f:
+            return base64.b64encode(f.read()).decode("utf-8")
+    except Exception:
+        return ""
+LOGO_B64 = to_b64(LOGO_PATH)
+
+# ---- Kopfbereich mit Titel + Reset-Button rechts oben ----
 header_col_l, header_col_c, header_col_r = st.columns([1, 3, 1])
 with header_col_c:
     st.markdown(
-        """
-        <div style="text-align:center; margin-bottom:0.5rem;">
-          <h1 style="margin-bottom:0.2rem;">🏨 Hotel Bellevue Grand</h1>
-          <p style="margin-top:0; color:#666;">Schnelle Hilfe beim Check-in, Zimmer & mehr mit unserem KI-Chatbot</p>
-        </div>
-        """,
+        "<div style='text-align:center; margin-bottom:0.5rem;'>"
+        "<h1 style='margin-bottom:0.2rem;'>🏨 Hotel Bellevue Grand</h1>"
+        "<p style='margin-top:0; color:#666;'>Schnelle Hilfe beim Check-in, Zimmer & mehr mit unserem KI-Chatbot</p>"
+        "</div>",
         unsafe_allow_html=True
     )
 with header_col_r:
@@ -24,50 +32,49 @@ with header_col_r:
         st.session_state.history = []
         st.rerun()
 
-# ——— Fixiertes Seiten-Panel rechts mit „KI-Chatbot“ und Bild ———
+# ---- Fixiertes Seiten-Panel rechts (HTML ohne Einrückungen, damit kein Codeblock entsteht) ----
+img_tag = f"<img src='data:image/png;base64,{LOGO_B64}' alt='Chatbot Logo'>" if LOGO_B64 else ""
 st.markdown(
-    """
-    <style>
-      .fixed-sidebox {
-        position: fixed;
-        top: 160px;
-        right: 24px;
-        width: 230px;
-        background: #ffffff;
-        border: 1px solid #e8e8e8;
-        border-radius: 16px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-        text-align: center;
-        padding: 16px 14px 18px;
-        z-index: 1000;
-      }
-      .fixed-sidebox h3 {
-        margin: 10px 0 0;
-        color: #222;
-        font-size: 24px;
-        line-height: 1.25;
-      }
-      .fixed-sidebox img {
-        display: block;
-        margin: 2px auto 6px;
-        max-width: 90%;
-        height: auto;
-        border-radius: 12px;
-      }
-      @media (max-width: 900px) {
-        .fixed-sidebox { display: none; }
-      }
-    </style>
-
-    <div class="fixed-sidebox">
-        <img src="AI-Chatbot.png" alt="Chatbot Logo">
-        <h3>KI-Chatbot</h3>
-    </div>
-    """,
+"""<style>
+.fixed-sidebox{
+position:fixed;
+top:160px;
+right:24px;
+width:230px;
+background:#ffffff;
+border:1px solid #e8e8e8;
+border-radius:16px;
+box-shadow:0 8px 20px rgba(0,0,0,0.08);
+text-align:center;
+padding:16px 14px 18px;
+z-index:1000;
+}
+.fixed-sidebox h3{
+margin:10px 0 0;
+color:#222;
+font-size:24px;
+line-height:1.25;
+}
+.fixed-sidebox img{
+display:block;
+margin:2px auto 6px;
+max-width:90%;
+height:auto;
+border-radius:12px;
+}
+@media (max-width:900px){
+.fixed-sidebox{display:none;}
+}
+</style>
+<div class="fixed-sidebox">
+""" + img_tag + """
+<h3>KI-Chatbot</h3>
+</div>
+""",
     unsafe_allow_html=True
 )
 
-# ——— Funktionen & Daten ———
+# ---- Daten laden & Helfer ----
 @st.cache_resource
 def load_kb(csv_path="answers.csv"):
     df = pd.read_csv(csv_path).fillna("")
@@ -98,22 +105,19 @@ def log_event(user_text, picked_id, sim, logfile="logs.csv"):
     exists = os.path.exists(logfile)
     pd.DataFrame([row]).to_csv(logfile, mode="a", index=False, header=not exists)
 
-# ——— Hauptlogik ———
+# ---- Hauptlogik ----
 df, vec, X = load_kb("answers.csv")
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Willkommensnachricht
 if not st.session_state.history:
     with st.chat_message("assistant"):
         st.write("Willkommen im Hotel! Wie kann ich helfen?")
 
-# Bisherige Nachrichten anzeigen
 for role, text in st.session_state.history:
     with st.chat_message(role):
         st.write(text)
 
-# Eingabefeld
 user_msg = st.chat_input("Frag mich etwas …")
 if user_msg:
     st.session_state.history.append(("user", user_msg))
