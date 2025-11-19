@@ -3,20 +3,9 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime
-import os, base64
-import time, random
+import os, time, random
 
 st.set_page_config(page_title="KI-Chatbot", page_icon="💬", layout="wide")
-
-# —— Logo als Base64 einbetten (robust, unabhängig vom Pfad im <img>) ——
-LOGO_PATH = "/mnt/data/8faa0e4f-b7db-4499-8ce6-2c4895491d2d.png"
-def encode_image(path):
-    try:
-        with open(path, "rb") as f:
-            return base64.b64encode(f.read()).decode("utf-8")
-    except Exception:
-        return ""  # Fallback: kein Bild
-LOGO_B64 = encode_image(LOGO_PATH)
 
 # ——— Kopfbereich mit Titel + Button rechts oben ———
 header_col_l, header_col_c, header_col_r = st.columns([1, 3, 1])
@@ -36,13 +25,10 @@ with header_col_r:
         st.rerun()
 
 # ——— Fixiertes Seiten-Panel rechts mit „KI-Chatbot“ und Bild ———
-# Falls das Bild nicht geladen werden kann, wird nur die Überschrift angezeigt.
-img_tag = f'<img src="data:image/png;base64,{LOGO_B64}" alt="Chatbot Logo">' if LOGO_B64 else ""
-
 st.markdown(
-    f"""
+    """
     <style>
-      .fixed-sidebox {{
+      .fixed-sidebox {
         position: fixed;
         top: 160px;
         right: 24px;
@@ -54,26 +40,27 @@ st.markdown(
         text-align: center;
         padding: 16px 14px 18px;
         z-index: 1000;
-      }}
-      .fixed-sidebox h3 {{
+      }
+      .fixed-sidebox h3 {
         margin: 10px 0 0;
         color: #222;
         font-size: 24px;
         line-height: 1.25;
-      }}
-      .fixed-sidebox img {{
+      }
+      .fixed-sidebox img {
         display: block;
         margin: 2px auto 6px;
         max-width: 90%;
         height: auto;
         border-radius: 12px;
-      }}
-      @media (max-width: 900px) {{
-        .fixed-sidebox {{ display: none; }}
-      }}
+      }
+      @media (max-width: 900px) {
+        .fixed-sidebox { display: none; }
+      }
     </style>
+
     <div class="fixed-sidebox">
-        {img_tag}
+        <img src="AI-Chatbot.png" alt="Chatbot Logo">
         <h3>KI-Chatbot</h3>
     </div>
     """,
