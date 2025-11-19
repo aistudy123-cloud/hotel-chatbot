@@ -27,40 +27,47 @@ with header_col_r:
 
 # ——— Fixiertes Seiten-Panel rechts mit „KI-Chatbot“ und Bild ———
 st.markdown(
-    """
+    f"""
     <style>
-      .fixed-sidebox {
+      .fixed-sidebox {{
         position: fixed;
-        top: 120px;
-        right: 40px;
-        width: 200px;
-        background: #f9f9f9;
-        border: 1px solid #ddd;
+        top: 160px;
+        right: 24px;
+        width: 230px;
+        background: #ffffff;
+        border: 1px solid #e8e8e8;
         border-radius: 16px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
         text-align: center;
-        padding: 15px;
+        padding: 16px 14px 18px;
         z-index: 1000;
-      }
-      .fixed-sidebox h3 {
-        margin-top: 10px;
-        color: #333;
-      }
-      .fixed-sidebox img {
-        width: 80px;
-        border-radius: 50%;
-        margin-top: 5px;
-      }
+      }}
+      .fixed-sidebox h3 {{
+        margin: 10px 0 0;
+        color: #222;
+        font-size: 24px;
+        line-height: 1.25;
+      }}
+      .fixed-sidebox img {{
+        display: block;
+        margin: 2px auto 6px;
+        max-width: 90%;
+        height: auto;
+        border-radius: 12px;
+      }}
+      @media (max-width: 900px) {{
+        .fixed-sidebox {{ display: none; }}
+      }}
     </style>
     <div class="fixed-sidebox">
-        <img src="AI-Chatbot.png" alt="Chatbot Logo">
+        <img src="/mnt/data/6b501425-a910-4b80-a33e-a25ca6e85123.png" alt="Chatbot Logo">
         <h3>KI-Chatbot</h3>
     </div>
     """,
     unsafe_allow_html=True
 )
 
-# ——— Laden der Datenbank ———
+# ——— Funktionen & Daten ———
 @st.cache_resource
 def load_kb(csv_path="answers.csv"):
     df = pd.read_csv(csv_path).fillna("")
@@ -91,11 +98,12 @@ def log_event(user_text, picked_id, sim, logfile="logs.csv"):
     exists = os.path.exists(logfile)
     pd.DataFrame([row]).to_csv(logfile, mode="a", index=False, header=not exists)
 
+# ——— Hauptlogik ———
 df, vec, X = load_kb("answers.csv")
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Willkommensnachricht nur wenn keine Historie
+# Willkommensnachricht
 if not st.session_state.history:
     with st.chat_message("assistant"):
         st.write("Willkommen im Hotel! Wie kann ich helfen?")
@@ -105,7 +113,7 @@ for role, text in st.session_state.history:
     with st.chat_message(role):
         st.write(text)
 
-# Eingabefeld unten
+# Eingabefeld
 user_msg = st.chat_input("Frag mich etwas …")
 if user_msg:
     st.session_state.history.append(("user", user_msg))
