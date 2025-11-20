@@ -34,38 +34,171 @@ with header_col_l:
 
 # ---- Fixiertes Seiten-Panel rechts (HTML ohne Einrückungen, damit kein Codeblock entsteht) ----
 img_tag = f"<img src='data:image/png;base64,{LOGO_B64}' alt='Chatbot Logo'>" if LOGO_B64 else ""
-st.markdown(
-"""<style>
+st.markdown("""
+<style>
+/* ========== Design Preset: Hotel Bellevue Grand ========== */
+
+/* — Farben & Typo — */
+:root{
+  --brand:#0E2A47;     /* Dunkelblau */
+  --brand-2:#3B6EA8;   /* Akzent */
+  --bg:#F6F7F9;        /* App-Hintergrund */
+  --card:#FFFFFF;      /* Karten / Bubbles */
+  --muted:#6B7280;     /* Sekundärtext */
+  --border:#E6E8EC;    /* Ränder */
+  --shadow:0 8px 24px rgba(15,23,42,0.08);
+}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+html, body, [data-testid="stAppViewContainer"] *{
+  font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+/* — App-Layout: dezenter Hintergrund & Content-Breite — */
+[data-testid="stAppViewContainer"]{
+  background:var(--bg);
+}
+main [data-testid="block-container"]{
+  max-width: 980px;
+  padding-top: 0.5rem;
+  padding-bottom: 2rem;
+  /* Platz rechts, damit nichts unter das fixe Sidepanel läuft */
+  padding-right: 290px;
+}
+
+/* — Überschrift-Zeile (dezent) — */
+h1{
+  color: var(--brand);
+  letter-spacing: .2px;
+}
+p, li { color:#111; }
+
+/* — Buttons allgemein — */
+.stButton button{
+  border-radius: 12px;
+  background: var(--brand);
+  color:#fff;
+  border:1px solid var(--brand);
+  padding:.55rem .9rem;
+  box-shadow: var(--shadow);
+  font-weight:600;
+}
+.stButton button:hover{ filter: brightness(1.05); }
+.stButton button:active{ transform: translateY(1px); }
+
+/* — Eingabefeld (Chat) — */
+[data-testid="stChatInput"] textarea{
+  border-radius:14px !important;
+  border:1px solid var(--border) !important;
+  background:#fff !important;
+  box-shadow: var(--shadow);
+}
+
+/* — Chatblasen — */
+[data-testid="stChatMessage"]{
+  background:transparent;
+  padding:0;
+  margin: 0 0 .4rem 0;
+}
+[data-testid="stChatMessage"] > div{ /* Bubble-Container */
+  background: var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding: .75rem .9rem;
+  box-shadow: var(--shadow);
+}
+
+/* User rechts ausrichten, Assistant links */
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) > div{
+  background: #FAFCFF;
+  border-color:#DDE7F5;
+  margin-left: 80px;   /* Platz für Avatar links */
+  margin-right: 0;
+}
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) > div{
+  background: #FFFFFF;
+  margin-right: 80px;  /* Platz für Avatar rechts */
+}
+
+/* Avatare dezenter */
+[data-testid="stChatMessageAvatarUser"], [data-testid="stChatMessageAvatarAssistant"]{
+  filter: saturate(.9);
+}
+
+/* Markdown im Chat kompakter & ohne große Lücken */
+[data-testid="stChatMessage"] p{
+  margin: .2rem 0 .1rem 0;
+  line-height: 1.45;
+}
+[data-testid="stChatMessage"] ul, 
+[data-testid="stChatMessage"] ol{
+  margin: .2rem 0 .2rem 1.1rem;
+}
+
+/* „schreibt…“ Platzhalter etwas feiner */
+[data-testid="stMarkdownContainer"] em{
+  color: var(--muted);
+}
+
+/* — Scrollbar dezent — */
+::-webkit-scrollbar{ width:10px; }
+::-webkit-scrollbar-thumb{
+  background:#C9D4E3; border-radius:8px; border:2px solid transparent; background-clip: padding-box;
+}
+::-webkit-scrollbar-track{ background:transparent; }
+
+/* — Fixiertes Seiten-Panel rechts — */
 .fixed-sidebox{
-position:fixed;
-top:160px;
-right:24px;
-width:230px;
-background:#ffffff;
-border:1px solid #e8e8e8;
-border-radius:16px;
-box-shadow:0 8px 20px rgba(0,0,0,0.08);
-text-align:center;
-padding:16px 14px 18px;
-z-index:1000;
+  position:fixed;
+  top:140px;                 /* etwas höher für mehr Balance */
+  right:24px;
+  width:230px;
+  background:#ffffff;
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow: var(--shadow);
+  text-align:center;
+  padding:16px 14px 18px;
+  z-index:1000;
 }
 .fixed-sidebox h3{
-margin:10px 0 0;
-color:#222;
-font-size:24px;
-line-height:1.25;
+  margin:10px 0 0;
+  color:var(--brand);
+  font-weight:700;
+  font-size:22px;
+  line-height:1.2;
 }
 .fixed-sidebox img{
-display:block;
-margin:2px auto 6px;
-max-width:60%;
-height:auto;
-border-radius:6px;
+  display:block;
+  margin:2px auto 6px;
+  max-width:65%;             /* <- kleineres Bild */
+  height:auto;
+  border-radius:12px;
+}
+@media (max-width: 1100px){
+  main [data-testid="block-container"]{ padding-right: 0; }
 }
 @media (max-width:900px){
-.fixed-sidebox{display:none;}
+  .fixed-sidebox{ display:none; }
 }
+
+/* — Karten/Container, falls irgendwo st.write(...) Karten rendert — */
+.block-container .stMarkdown, .block-container .stText{
+  color:#111;
+}
+
+/* — Feine Kanten für Tabellen (falls du welche zeigst) — */
+table{
+  border-collapse:separate !important;
+  border-spacing:0 !important;
+  overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:12px;
+}
+thead tr th{ background:#F3F6FA !important; color:#0F172A; }
+tbody tr + tr td{ border-top:1px solid var(--border) !important; }
 </style>
+""", unsafe_allow_html=True)
+
 <div class="fixed-sidebox">
 """ + img_tag + """
 <h3>KI-Chatbot</h3>
