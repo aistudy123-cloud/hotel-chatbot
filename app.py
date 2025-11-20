@@ -3,22 +3,160 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime
-import os
-import time, random  # <— nach oben geholt
+import os, base64, time, random
 
 st.set_page_config(page_title="KI-Chatbot", page_icon="💬")
 
-st.markdown(
-    """
-    <div style="text-align:center; margin-bottom:0.5rem;">
-      <h1 style="margin-bottom:0.2rem;">🏨 Hotel Bellevue Grand</h1>
-      <p style="margin-top:0; color:#666;">Schnelle Hilfe beim Check-in, Zimmer & mehr mit unserem KI-Chatbot</p>
+# ---- Logo laden & als Base64 einbetten (vermeidet Pfad-/Serving-Probleme) ----
+def to_b64(path: str) -> str:
+    try:
+        with open(path, "rb") as f:
+            return base64.b64encode(f.read()).decode("utf-8")
+    except Exception:
+        return ""
 
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# Rechtsseitiges Chatbot-Logo
+LOGO_PATH = "AI-Chatbot.png"
+LOGO_B64 = to_b64(LOGO_PATH)
 
+# Header-Bild oben mittig
+HEADER_LOGO_PATH = "bed.jpg"
+HEADER_LOGO_B64 = to_b64(HEADER_LOGO_PATH)
+
+# ---- Kopfbereich mit Headerbild (Banner-Stil), Titel & Reset-Button ----
+HEADER_IMG_PATH = "bed.jpg"
+HEADER_IMG_B64 = to_b64(HEADER_IMG_PATH)
+
+if HEADER_IMG_B64:
+    st.markdown(
+        f"""
+        <div style='position:relative; text-align:center; margin-bottom:1.5rem;'>
+            <img src='data:image/jpeg;base64,{HEADER_IMG_B64}'
+                 alt='Hotel Header'
+                 style='width:100%; max-height:280px; object-fit:cover; border-radius:0 0 20px 20px;
+                        box-shadow:0 4px 14px rgba(0,0,0,0.15);'>
+            <div style='position:absolute; bottom:25px; left:0; width:100%; text-align:center; color:white;
+                        text-shadow:0 2px 6px rgba(0,0,0,0.5);'>
+                <h1 style='font-size:2.2rem; margin-bottom:0.2rem;'>🏨 Hotel Bellevue Grand</h1>
+                <p style='font-size:1.05rem; margin-top:0;'>Schnelle Hilfe beim Check-in, Zimmer & mehr mit unserem KI-Chatbot</p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+else:
+    st.markdown(
+        "<div style='text-align:center; margin-bottom:0.5rem;'>"
+        "<h1 style='margin-bottom:0.2rem;'>🏨 Hotel Bellevue Grand</h1>"
+        "<p style='margin-top:0; color:#666;'>Schnelle Hilfe beim Check-in, Zimmer & mehr mit unserem KI-Chatbot</p>"
+        "</div>",
+        unsafe_allow_html=True
+    )
+
+# Reset-Button oben rechts
+#reset_col = st.columns([5, 1])[1]
+#with reset_col:
+#    if st.button('🧹 Unterhaltung neu starten', key='btn_reset_top'):
+#        st.session_state.history = []
+#        st.rerun()
+
+
+# ---- Fixiertes Seiten-Panel rechts ----
+img_tag = f"<img src='data:image/png;base64,{LOGO_B64}' alt='Chatbot Logo'>" if LOGO_B64 else ""
+st.markdown("""
+<style>
+/* ========== Design Preset: Hotel Bellevue Grand ========== */
+
+/* — Farben & Typo — */
+:root{
+  --brand:#8fd1f2;     /* Primärfarbe */
+  --brand-2:#3B6EA8;   /* Akzent */
+  --bg:#F6F7F9;        /* App-Hintergrund */
+  --card:#FFFFFF;      /* Karten / Bubbles */
+  --muted:#6B7280;     /* Sekundärtext */
+  --border:#E6E8EC;    /* Ränder */
+  --shadow:0 8px 24px rgba(15,23,42,0.08);
+}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+html, body, [data-testid="stAppViewContainer"] *{
+  font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+/* — App-Layout — */
+[data-testid="stAppViewContainer"]{ background:var(--bg); }
+main [data-testid="block-container"]{
+  max-width: 980px;
+  padding-top: 0.5rem;
+  padding-bottom: 2rem;
+  padding-right: 290px; /* Platz rechts für Sidepanel */
+}
+
+/* Buttons */
+.stButton button{
+  border-radius: 12px;
+  background: var(--brand);
+  color:#fff;
+  border:1px solid var(--brand);
+  padding:.55rem .9rem;
+  box-shadow: var(--shadow);
+  font-weight:600;
+}
+.stButton button:hover{ filter: brightness(1.05); }
+.stButton button:active{ transform: translateY(1px); }
+
+
+
+
+/* Scrollbar */
+::-webkit-scrollbar{ width:10px; }
+::-webkit-scrollbar-thumb{
+  background:#C9D4E3; border-radius:8px; border:2px solid transparent; background-clip: padding-box;
+}
+::-webkit-scrollbar-track{ background:transparent; }
+
+/* Fixiertes Seitenpanel */
+.fixed-sidebox{
+  position:fixed;
+  top:120px;  /* tiefer wegen Header-Bild */
+  right:24px;
+  width:230px;
+  background:#ffffff;
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow: var(--shadow);
+  text-align:center;
+  padding:16px 14px 18px;
+  z-index:1000;
+}
+.fixed-sidebox h3{
+  margin:10px 0 0;
+  color:var(--brand);
+  font-weight:700;
+  font-size:22px;
+  line-height:1.2;
+}
+.fixed-sidebox img{
+  display:block;
+  margin:2px auto 6px;
+  max-width:65%;
+  height:auto;
+  border-radius:12px;
+}
+@media (max-width: 1100px){
+  main [data-testid="block-container"]{ padding-right: 0; }
+}
+@media (max-width:900px){
+  .fixed-sidebox{ display:none; }
+}
+</style>
+
+<div class="fixed-sidebox">
+""" + img_tag + """
+<h3>KI-Chatbot</h3>
+</div>
+""", unsafe_allow_html=True)
+
+# ---- Daten laden & Helfer ----
 @st.cache_resource
 def load_kb(csv_path="answers.csv"):
     df = pd.read_csv(csv_path).fillna("")
@@ -28,7 +166,7 @@ def load_kb(csv_path="answers.csv"):
     X = vec.fit_transform(df["question"].tolist())
     return df, vec, X
 
-def find_best_answer(user_text, df, vec, X, threshold=0.25, topk=3):
+def find_best_answer(user_text, df, vec, X, threshold=0.20, topk=3):
     q = vec.transform([user_text])
     sims = cosine_similarity(q, X).flatten()
     best_idx = int(sims.argmax())
@@ -49,51 +187,33 @@ def log_event(user_text, picked_id, sim, logfile="logs.csv"):
     exists = os.path.exists(logfile)
     pd.DataFrame([row]).to_csv(logfile, mode="a", index=False, header=not exists)
 
-# Titel mittig (per HTML)
-st.markdown('<h2 style="text-align:center;">KI-Chatbot</h2>', unsafe_allow_html=True)
-
-# Bild zentriert
-center_col = st.columns([3, 2, 3])[1]
-with center_col:
-    st.image("AI-Chatbot.png", width=140)
-
+# ---- Hauptlogik ----
 df, vec, X = load_kb("answers.csv")
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Button zum Löschen des bisherigen Chatverlaufs
-if st.button("🧹 Neue Unterhaltung starten"):
-    st.session_state.history = []
-    st.rerun()
-
-# Willkommensnachricht nur wenn keine Historie
 if not st.session_state.history:
     with st.chat_message("assistant"):
         st.write("Willkommen im Hotel! Wie kann ich helfen?")
 
-# Bisherige Nachrichten anzeigen
 for role, text in st.session_state.history:
     with st.chat_message(role):
         st.write(text)
 
-# Eingabefeld unten
 user_msg = st.chat_input("Frag mich etwas …")
 if user_msg:
-    # Nutzer-Nachricht anzeigen + speichern
     st.session_state.history.append(("user", user_msg))
     with st.chat_message("user"):
         st.write(user_msg)
 
-    # Antwort bestimmen
     best, sim, top = find_best_answer(user_msg, df, vec, X, threshold=0.20, topk=3)
     if best is None:
-        bot_text = "Dazu kann ich dir leider nicht weiterhelfen."
+        bot_text = "Das weiß ich leider nicht."
         picked_id = ""
     else:
         bot_text = best["answer"]
         picked_id = best["id"]
 
-    # Realistische Tipp-Animation + Ausgabe (JETZT liegt bot_text vor!)
     with st.chat_message("assistant"):
         dots = st.empty()
         for i in range(3):
@@ -108,8 +228,5 @@ if user_msg:
             output.markdown(displayed)
             time.sleep(random.uniform(0.01, 0.03))
 
-    # Bot-Antwort im Verlauf speichern (damit sie nach Rerun bleibt)
     st.session_state.history.append(("assistant", bot_text))
-
-    # Logging
     log_event(user_msg, picked_id, sim if best is not None else 0.0)
