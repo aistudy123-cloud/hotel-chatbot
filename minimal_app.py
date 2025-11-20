@@ -40,7 +40,7 @@ st.markdown("""
 
 /* — Farben & Typo — */
 :root{
-  --brand:#0E2A47;     /* Dunkelblau */
+  --brand:#7f9cba;     /* Dunkelblau */
   --brand-2:#3B6EA8;   /* Akzent */
   --bg:#F6F7F9;        /* App-Hintergrund */
   --card:#FFFFFF;      /* Karten / Bubbles */
@@ -119,10 +119,6 @@ p, li { color:#111; }
   margin-right: 80px;  /* Platz für Avatar rechts */
 }
 
-/* Avatare dezenter */
-[data-testid="stChatMessageAvatarUser"], [data-testid="stChatMessageAvatarAssistant"]{
-  filter: saturate(.9);
-}
 
 /* Markdown im Chat kompakter & ohne große Lücken */
 [data-testid="stChatMessage"] p{
@@ -149,7 +145,7 @@ p, li { color:#111; }
 /* — Fixiertes Seiten-Panel rechts — */
 .fixed-sidebox{
   position:fixed;
-  top:140px;                 /* etwas höher für mehr Balance */
+  top:100px;                 /* etwas höher für mehr Balance */
   right:24px;
   width:230px;
   background:#ffffff;
@@ -186,14 +182,7 @@ p, li { color:#111; }
   color:#111;
 }
 
-/* — Feine Kanten für Tabellen (falls du welche zeigst) — */
-table{
-  border-collapse:separate !important;
-  border-spacing:0 !important;
-  overflow:hidden;
-  border:1px solid var(--border);
-  border-radius:12px;
-}
+
 thead tr th{ background:#F3F6FA !important; color:#0F172A; }
 tbody tr + tr td{ border-top:1px solid var(--border) !important; }
 </style>
