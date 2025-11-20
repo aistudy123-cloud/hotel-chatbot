@@ -5,7 +5,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime
 import os, base64, time, random
 
-st.set_page_config(page_title="KI-Chatbot", page_icon="💬")
+st.set_page_config(page_title="KI-Chatbot", page_icon="💬", layout="wide")
 
 # ---- Logo laden & als Base64 einbetten (vermeidet Pfad-/Serving-Probleme) ----
 LOGO_PATH = "AI-Chatbot.png"
