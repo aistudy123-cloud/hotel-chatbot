@@ -23,35 +23,43 @@ LOGO_B64 = to_b64(LOGO_PATH)
 HEADER_LOGO_PATH = "bed.jpg"
 HEADER_LOGO_B64 = to_b64(HEADER_LOGO_PATH)
 
-# ---- Kopfbereich mit Bild (zentriert), Titel & Reset-Button rechts ----
-header_col_l, header_col_c, header_col_r = st.columns([1, 3, 1])
-with header_col_c:
-    if HEADER_LOGO_B64:
-        st.markdown(
-            f"""
-            <div style='text-align:center; margin-bottom:0.8rem;'>
-                <img src='data:image/jpeg;base64,{HEADER_LOGO_B64}'
-                     alt='Hotel Header'
-                     style='max-width:260px; height:auto; margin-bottom:0.5rem; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,0.1);'>
-                <h1 style='margin-bottom:0.2rem; color:#0E2A47;'>🏨 Hotel Bellevue Grand</h1>
-                <p style='margin-top:0; color:#666;'>Schnelle Hilfe beim Check-in, Zimmer & mehr mit unserem KI-Chatbot</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-    else:
-        st.markdown(
-            "<div style='text-align:center; margin-bottom:0.5rem;'>"
-            "<h1 style='margin-bottom:0.2rem;'>🏨 Hotel Bellevue Grand</h1>"
-            "<p style='margin-top:0; color:#666;'>Schnelle Hilfe beim Check-in, Zimmer & mehr mit unserem KI-Chatbot</p>"
-            "</div>",
-            unsafe_allow_html=True
-        )
+# ---- Kopfbereich mit Headerbild (Banner-Stil), Titel & Reset-Button ----
+HEADER_IMG_PATH = "bed.jpg"
+HEADER_IMG_B64 = to_b64(HEADER_IMG_PATH)
 
-with header_col_l:
-    if st.button("🧹 Unterhaltung neu starten", key="btn_reset_top"):
+if HEADER_IMG_B64:
+    st.markdown(
+        f"""
+        <div style='position:relative; text-align:center; margin-bottom:1.5rem;'>
+            <img src='data:image/jpeg;base64,{HEADER_IMG_B64}'
+                 alt='Hotel Header'
+                 style='width:100%; max-height:280px; object-fit:cover; border-radius:0 0 20px 20px;
+                        box-shadow:0 4px 14px rgba(0,0,0,0.15);'>
+            <div style='position:absolute; bottom:25px; left:0; width:100%; text-align:center; color:white;
+                        text-shadow:0 2px 6px rgba(0,0,0,0.5);'>
+                <h1 style='font-size:2.2rem; margin-bottom:0.2rem;'>🏨 Hotel Bellevue Grand</h1>
+                <p style='font-size:1.05rem; margin-top:0;'>Schnelle Hilfe beim Check-in, Zimmer & mehr mit unserem KI-Chatbot</p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+else:
+    st.markdown(
+        "<div style='text-align:center; margin-bottom:0.5rem;'>"
+        "<h1 style='margin-bottom:0.2rem;'>🏨 Hotel Bellevue Grand</h1>"
+        "<p style='margin-top:0; color:#666;'>Schnelle Hilfe beim Check-in, Zimmer & mehr mit unserem KI-Chatbot</p>"
+        "</div>",
+        unsafe_allow_html=True
+    )
+
+# Reset-Button oben rechts
+reset_col = st.columns([5, 1])[1]
+with reset_col:
+    if st.button('🧹 Unterhaltung neu starten', key='btn_reset_top'):
         st.session_state.history = []
         st.rerun()
+
 
 # ---- Fixiertes Seiten-Panel rechts ----
 img_tag = f"<img src='data:image/png;base64,{LOGO_B64}' alt='Chatbot Logo'>" if LOGO_B64 else ""
