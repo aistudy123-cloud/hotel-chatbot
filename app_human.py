@@ -105,7 +105,16 @@ main [data-testid="block-container"]{
 .stButton button:active{ transform: translateY(1px); }
 
 
-
+/* User rechts, Bot links */
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) > div{
+  background: #FAFCFF;
+  border-color:#DDE7F5;
+  margin-left: 80px;
+}
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) > div{
+  background: #FFFFFF;
+  margin-right: 80px;
+}
 
 /* Scrollbar */
 ::-webkit-scrollbar{ width:10px; }
