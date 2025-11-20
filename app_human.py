@@ -105,6 +105,20 @@ main [data-testid="block-container"]{
 .stButton button:active{ transform: translateY(1px); }
 
 
+/* Chatblasen */
+[data-testid="stChatMessage"]{
+  background:transparent;
+  padding:0;
+  margin: 0 0 .4rem 0;
+}
+[data-testid="stChatMessage"] > div{
+  background: var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding: .75rem .9rem;
+  box-shadow: var(--shadow);
+}
+
 /* User rechts, Bot links */
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) > div{
   background: #FAFCFF;
