@@ -8,31 +8,52 @@ import os, base64, time, random
 st.set_page_config(page_title="KI-Chatbot", page_icon="💬", layout="wide")
 
 # ---- Logo laden & als Base64 einbetten (vermeidet Pfad-/Serving-Probleme) ----
-LOGO_PATH = "AI-Chatbot.png"
 def to_b64(path: str) -> str:
     try:
         with open(path, "rb") as f:
             return base64.b64encode(f.read()).decode("utf-8")
     except Exception:
         return ""
+
+# Rechtsseitiges Chatbot-Logo
+LOGO_PATH = "AI-Chatbot.png"
 LOGO_B64 = to_b64(LOGO_PATH)
 
-# ---- Kopfbereich mit Titel + Reset-Button rechts oben ----
+# Header-Bild oben mittig
+HEADER_LOGO_PATH = "bed.jpg"
+HEADER_LOGO_B64 = to_b64(HEADER_LOGO_PATH)
+
+# ---- Kopfbereich mit Bild (zentriert), Titel & Reset-Button rechts ----
 header_col_l, header_col_c, header_col_r = st.columns([1, 3, 1])
 with header_col_c:
-    st.markdown(
-        "<div style='text-align:center; margin-bottom:0.5rem;'>"
-        "<h1 style='margin-bottom:0.2rem;'>🏨 Hotel Bellevue Grand</h1>"
-        "<p style='margin-top:0; color:#666;'>Schnelle Hilfe beim Check-in, Zimmer & mehr mit unserem KI-Chatbot</p>"
-        "</div>",
-        unsafe_allow_html=True
-    )
-with header_col_l:
+    if HEADER_LOGO_B64:
+        st.markdown(
+            f"""
+            <div style='text-align:center; margin-bottom:0.8rem;'>
+                <img src='data:image/jpeg;base64,{HEADER_LOGO_B64}'
+                     alt='Hotel Header'
+                     style='max-width:260px; height:auto; margin-bottom:0.5rem; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,0.1);'>
+                <h1 style='margin-bottom:0.2rem; color:#0E2A47;'>🏨 Hotel Bellevue Grand</h1>
+                <p style='margin-top:0; color:#666;'>Schnelle Hilfe beim Check-in, Zimmer & mehr mit unserem KI-Chatbot</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+    else:
+        st.markdown(
+            "<div style='text-align:center; margin-bottom:0.5rem;'>"
+            "<h1 style='margin-bottom:0.2rem;'>🏨 Hotel Bellevue Grand</h1>"
+            "<p style='margin-top:0; color:#666;'>Schnelle Hilfe beim Check-in, Zimmer & mehr mit unserem KI-Chatbot</p>"
+            "</div>",
+            unsafe_allow_html=True
+        )
+
+with header_col_r:
     if st.button("🧹 Unterhaltung neu starten", key="btn_reset_top"):
         st.session_state.history = []
         st.rerun()
 
-# ---- Fixiertes Seiten-Panel rechts (HTML ohne Einrückungen, damit kein Codeblock entsteht) ----
+# ---- Fixiertes Seiten-Panel rechts ----
 img_tag = f"<img src='data:image/png;base64,{LOGO_B64}' alt='Chatbot Logo'>" if LOGO_B64 else ""
 st.markdown("""
 <style>
@@ -40,7 +61,7 @@ st.markdown("""
 
 /* — Farben & Typo — */
 :root{
-  --brand:#7f9cba;     /* Dunkelblau */
+  --brand:#90bbe8;     /* Primärfarbe */
   --brand-2:#3B6EA8;   /* Akzent */
   --bg:#F6F7F9;        /* App-Hintergrund */
   --card:#FFFFFF;      /* Karten / Bubbles */
@@ -53,26 +74,16 @@ html, body, [data-testid="stAppViewContainer"] *{
   font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-/* — App-Layout: dezenter Hintergrund & Content-Breite — */
-[data-testid="stAppViewContainer"]{
-  background:var(--bg);
-}
+/* — App-Layout — */
+[data-testid="stAppViewContainer"]{ background:var(--bg); }
 main [data-testid="block-container"]{
   max-width: 980px;
   padding-top: 0.5rem;
   padding-bottom: 2rem;
-  /* Platz rechts, damit nichts unter das fixe Sidepanel läuft */
-  padding-right: 290px;
+  padding-right: 290px; /* Platz rechts für Sidepanel */
 }
 
-/* — Überschrift-Zeile (dezent) — */
-h1{
-  color: var(--brand);
-  letter-spacing: .2px;
-}
-p, li { color:#111; }
-
-/* — Buttons allgemein — */
+/* Buttons */
 .stButton button{
   border-radius: 12px;
   background: var(--brand);
@@ -85,7 +96,7 @@ p, li { color:#111; }
 .stButton button:hover{ filter: brightness(1.05); }
 .stButton button:active{ transform: translateY(1px); }
 
-/* — Eingabefeld (Chat) — */
+/* Eingabefeld */
 [data-testid="stChatInput"] textarea{
   border-radius:14px !important;
   border:1px solid var(--border) !important;
@@ -93,13 +104,13 @@ p, li { color:#111; }
   box-shadow: var(--shadow);
 }
 
-/* — Chatblasen — */
+/* Chatblasen */
 [data-testid="stChatMessage"]{
   background:transparent;
   padding:0;
   margin: 0 0 .4rem 0;
 }
-[data-testid="stChatMessage"] > div{ /* Bubble-Container */
+[data-testid="stChatMessage"] > div{
   background: var(--card);
   border:1px solid var(--border);
   border-radius:16px;
@@ -107,45 +118,28 @@ p, li { color:#111; }
   box-shadow: var(--shadow);
 }
 
-/* User rechts ausrichten, Assistant links */
+/* User rechts, Bot links */
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) > div{
   background: #FAFCFF;
   border-color:#DDE7F5;
-  margin-left: 80px;   /* Platz für Avatar links */
-  margin-right: 0;
+  margin-left: 80px;
 }
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) > div{
   background: #FFFFFF;
-  margin-right: 80px;  /* Platz für Avatar rechts */
+  margin-right: 80px;
 }
 
-
-/* Markdown im Chat kompakter & ohne große Lücken */
-[data-testid="stChatMessage"] p{
-  margin: .2rem 0 .1rem 0;
-  line-height: 1.45;
-}
-[data-testid="stChatMessage"] ul, 
-[data-testid="stChatMessage"] ol{
-  margin: .2rem 0 .2rem 1.1rem;
-}
-
-/* „schreibt…“ Platzhalter etwas feiner */
-[data-testid="stMarkdownContainer"] em{
-  color: var(--muted);
-}
-
-/* — Scrollbar dezent — */
+/* Scrollbar */
 ::-webkit-scrollbar{ width:10px; }
 ::-webkit-scrollbar-thumb{
   background:#C9D4E3; border-radius:8px; border:2px solid transparent; background-clip: padding-box;
 }
 ::-webkit-scrollbar-track{ background:transparent; }
 
-/* — Fixiertes Seiten-Panel rechts — */
+/* Fixiertes Seitenpanel */
 .fixed-sidebox{
   position:fixed;
-  top:100px;                 /* etwas höher für mehr Balance */
+  top:160px;  /* tiefer wegen Header-Bild */
   right:24px;
   width:230px;
   background:#ffffff;
@@ -166,7 +160,7 @@ p, li { color:#111; }
 .fixed-sidebox img{
   display:block;
   margin:2px auto 6px;
-  max-width:65%;             /* <- kleineres Bild */
+  max-width:65%;
   height:auto;
   border-radius:12px;
 }
@@ -176,15 +170,6 @@ p, li { color:#111; }
 @media (max-width:900px){
   .fixed-sidebox{ display:none; }
 }
-
-/* — Karten/Container, falls irgendwo st.write(...) Karten rendert — */
-.block-container .stMarkdown, .block-container .stText{
-  color:#111;
-}
-
-
-thead tr th{ background:#F3F6FA !important; color:#0F172A; }
-tbody tr + tr td{ border-top:1px solid var(--border) !important; }
 </style>
 
 <div class="fixed-sidebox">
