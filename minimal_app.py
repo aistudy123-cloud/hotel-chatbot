@@ -5,7 +5,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from datetime import datetime
 import os, base64, time, random
 
-st.set_page_config(page_title="KI-Chatbot", page_icon="💬", layout="wide")
+st.set_page_config(page_title="KI-Chatbot", page_icon="💬")
 
 # ---- Logo laden & als Base64 einbetten (vermeidet Pfad-/Serving-Probleme) ----
 def to_b64(path: str) -> str:
@@ -48,7 +48,7 @@ with header_col_c:
             unsafe_allow_html=True
         )
 
-with header_col_r:
+with header_col_l:
     if st.button("🧹 Unterhaltung neu starten", key="btn_reset_top"):
         st.session_state.history = []
         st.rerun()
@@ -61,7 +61,7 @@ st.markdown("""
 
 /* — Farben & Typo — */
 :root{
-  --brand:#90bbe8;     /* Primärfarbe */
+  --brand:#8fd1f2;     /* Primärfarbe */
   --brand-2:#3B6EA8;   /* Akzent */
   --bg:#F6F7F9;        /* App-Hintergrund */
   --card:#FFFFFF;      /* Karten / Bubbles */
