@@ -123,11 +123,11 @@ main [data-testid="block-container"]{
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) > div{
   background: #FAFCFF;
   border-color:#DDE7F5;
-  margin-left: 80px;
+  margin-left: 200px;
 }
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) > div{
   background: #FFFFFF;
-  margin-right: 80px;
+  margin-right: 200px;
 }
 
 /* Scrollbar */
