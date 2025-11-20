@@ -197,7 +197,6 @@ table{
 thead tr th{ background:#F3F6FA !important; color:#0F172A; }
 tbody tr + tr td{ border-top:1px solid var(--border) !important; }
 </style>
-""", unsafe_allow_html=True)
 
 <div class="fixed-sidebox">
 """ + img_tag + """
