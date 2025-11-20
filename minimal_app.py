@@ -54,11 +54,11 @@ else:
     )
 
 # Reset-Button oben rechts
-reset_col = st.columns([5, 1])[1]
-with reset_col:
-    if st.button('🧹 Unterhaltung neu starten', key='btn_reset_top'):
-        st.session_state.history = []
-        st.rerun()
+#reset_col = st.columns([5, 1])[1]
+#with reset_col:
+#    if st.button('🧹 Unterhaltung neu starten', key='btn_reset_top'):
+#        st.session_state.history = []
+#        st.rerun()
 
 
 # ---- Fixiertes Seiten-Panel rechts ----
@@ -105,30 +105,7 @@ main [data-testid="block-container"]{
 .stButton button:active{ transform: translateY(1px); }
 
 
-/* Chatblasen */
-[data-testid="stChatMessage"]{
-  background:transparent;
-  padding:0;
-  margin: 0 0 .4rem 0;
-}
-[data-testid="stChatMessage"] > div{
-  background: var(--card);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding: .75rem .9rem;
-  box-shadow: var(--shadow);
-}
 
-/* User rechts, Bot links */
-[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) > div{
-  background: #FAFCFF;
-  border-color:#DDE7F5;
-  margin-left: 80px;
-}
-[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) > div{
-  background: #FFFFFF;
-  margin-right: 80px;
-}
 
 /* Scrollbar */
 ::-webkit-scrollbar{ width:10px; }
