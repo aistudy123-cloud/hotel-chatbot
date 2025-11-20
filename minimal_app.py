@@ -27,7 +27,7 @@ with header_col_c:
         "</div>",
         unsafe_allow_html=True
     )
-with header_col_r:
+with header_col_l:
     if st.button("🧹 Unterhaltung neu starten", key="btn_reset_top"):
         st.session_state.history = []
         st.rerun()
