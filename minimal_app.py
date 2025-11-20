@@ -203,9 +203,7 @@ tbody tr + tr td{ border-top:1px solid var(--border) !important; }
 """ + img_tag + """
 <h3>KI-Chatbot</h3>
 </div>
-""",
-    unsafe_allow_html=True
-)
+""", unsafe_allow_html=True)
 
 # ---- Daten laden & Helfer ----
 @st.cache_resource
