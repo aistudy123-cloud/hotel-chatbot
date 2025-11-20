@@ -8,7 +8,7 @@ import os, base64, time, random
 st.set_page_config(page_title="KI-Chatbot", page_icon="💬")
 
 # ---- Logo laden & als Base64 einbetten (vermeidet Pfad-/Serving-Probleme) ----
-LOGO_PATH = "/mnt/data/87ad994e-833e-4bd5-b88f-ff6781e1f746.png"
+LOGO_PATH = "/mnt/data/AI-Chatbot.png"
 def to_b64(path: str) -> str:
     try:
         with open(path, "rb") as f:
