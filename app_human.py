@@ -20,13 +20,10 @@ LOGO_PATH = "Mitarbeiter.jpg"
 LOGO_B64 = to_b64(LOGO_PATH)
 
 # Header-Bild oben mittig
-HEADER_LOGO_PATH = "bed.jpg"
-HEADER_LOGO_B64 = to_b64(HEADER_LOGO_PATH)
-
-# ---- Kopfbereich mit Headerbild (Banner-Stil), Titel & Reset-Button ----
 HEADER_IMG_PATH = "bed.jpg"
 HEADER_IMG_B64 = to_b64(HEADER_IMG_PATH)
 
+# ---- Kopfbereich mit Headerbild (Banner-Stil), Titel ----
 if HEADER_IMG_B64:
     st.markdown(
         f"""
@@ -38,7 +35,7 @@ if HEADER_IMG_B64:
             <div style='position:absolute; bottom:25px; left:0; width:100%; text-align:center; color:white;
                         text-shadow:0 2px 6px rgba(0,0,0,0.5);'>
                 <h1 style='font-size:2.2rem; margin-bottom:0.2rem;'>🏨 Hotel Bellevue Grand</h1>
-                <p style='font-size:1.05rem; margin-top:0;'>Schnelle Hilfe beim Check-in, Zimmer & mehr mit unserem Mitarbeiter-Chat</p>
+                <p style='font-size:1.05rem; margin-top:0;'>Schnelle Hilfe beim Check-in, Zimmer &amp; mehr mit unserem Mitarbeiter-Chat</p>
             </div>
         </div>
         """,
@@ -46,23 +43,18 @@ if HEADER_IMG_B64:
     )
 else:
     st.markdown(
-        "<div style='text-align:center; margin-bottom:0.5rem;'>"
-        "<h1 style='margin-bottom:0.2rem;'>🏨 Hotel Bellevue Grand</h1>"
-        "<p style='margin-top:0; color:#666;'>Schnelle Hilfe beim Check-in, Zimmer & mehr mit unserem Mitarbeiter-Chat<</p>"
-        "</div>",
+        """
+        <div style='text-align:center; margin-bottom:0.5rem;'>
+          <h1 style='margin-bottom:0.2rem;'>🏨 Hotel Bellevue Grand</h1>
+          <p style='margin-top:0; color:#666;'>Schnelle Hilfe beim Check-in, Zimmer &amp; mehr mit unserem Mitarbeiter-Chat</p>
+        </div>
+        """,
         unsafe_allow_html=True
     )
 
-# Reset-Button oben rechts
-#reset_col = st.columns([5, 1])[1]
-#with reset_col:
-#    if st.button('🧹 Unterhaltung neu starten', key='btn_reset_top'):
-#        st.session_state.history = []
-#        st.rerun()
-
-
 # ---- Fixiertes Seiten-Panel rechts ----
-img_tag = f"<img src='data:image/png;base64,{LOGO_B64}' alt='Chatbot Logo'>" if LOGO_B64 else ""
+# MIME-Typ an JPEG anpassen, weil LOGO_PATH .jpg ist
+img_tag = f"<img src='data:image/jpeg;base64,{LOGO_B64}' alt='Chatbot Logo'>" if LOGO_B64 else ""
 st.markdown("""
 <style>
 /* ========== Design Preset: Hotel Bellevue Grand ========== */
@@ -104,30 +96,26 @@ main [data-testid="block-container"]{
 .stButton button:hover{ filter: brightness(1.05); }
 .stButton button:active{ transform: translateY(1px); }
 
-
-/* Chatblasen */
-[data-testid="stChatMessage"]{
-  background:transparent;
-  padding:0;
-  margin: 0 0 .4rem 0;
-}
-[data-testid="stChatMessage"] > div{
+/* ===== Chatblasen über eigene Klassen (robust, unabhängig von Streamlit-Interna) ===== */
+.bubble{
   background: var(--card);
   border:1px solid var(--border);
   border-radius:16px;
-  padding: .75rem .9rem;
+  padding:.75rem .9rem;
   box-shadow: var(--shadow);
+  margin:0 0 .4rem 0;
+  word-wrap: break-word;
 }
 
 /* User rechts, Bot links */
-[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) > div{
-  background: #FAFCFF;
+.bubble.user{
+  background:#FAFCFF;
   border-color:#DDE7F5;
-  margin-left: 200px;
+  margin-left:200px;   /* schiebt Richtung rechts */
 }
-[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) > div{
-  background: #FFFFFF;
-  margin-right: 200px;
+.bubble.bot{
+  background:#FFFFFF;
+  margin-right:200px;  /* schiebt Richtung links */
 }
 
 /* Scrollbar */
@@ -165,6 +153,8 @@ main [data-testid="block-container"]{
   height:auto;
   border-radius:12px;
 }
+
+/* Responsive: Sidepanel ausblenden und Padding zurücknehmen */
 @media (max-width: 1100px){
   main [data-testid="block-container"]{ padding-right: 0; }
 }
@@ -212,23 +202,31 @@ def log_event(user_text, picked_id, sim, logfile="logs.csv"):
 
 # ---- Hauptlogik ----
 df, vec, X = load_kb("answers.csv")
+
 if "history" not in st.session_state:
     st.session_state.history = []
 
+# Begrüßung (als Bot-Blase)
 if not st.session_state.history:
     with st.chat_message("assistant", avatar="👩‍💼"):
-        st.write("Willkommen im Hotel! Wie kann ich helfen?")
+        st.markdown("<div class='bubble bot'>Willkommen im Hotel! Wie kann ich helfen?</div>", unsafe_allow_html=True)
 
+# Verlauf rendern (mit Rollenklassen)
 for role, text in st.session_state.history:
     with st.chat_message(role):
-        st.write(text)
+        who = "user" if role == "user" else "bot"
+        st.markdown(f"<div class='bubble {who}'>{text}</div>", unsafe_allow_html=True)
 
+# Eingabe
 user_msg = st.chat_input("Frag mich etwas …")
+
 if user_msg:
+    # User anzeigen (rechts)
     st.session_state.history.append(("user", user_msg))
     with st.chat_message("user", avatar="🧒"):
-        st.write(user_msg)
+        st.markdown(f"<div class='bubble user'>{user_msg}</div>", unsafe_allow_html=True)
 
+    # Antwort suchen
     best, sim, top = find_best_answer(user_msg, df, vec, X, threshold=0.20, topk=3)
     if best is None:
         bot_text = "Das weiß ich leider nicht."
@@ -237,10 +235,11 @@ if user_msg:
         bot_text = best["answer"]
         picked_id = best["id"]
 
+    # Bot-Antwort streamen (links, in einer Bubble)
     with st.chat_message("assistant", avatar="👩‍💼"):
         dots = st.empty()
         for i in range(3):
-            dots.markdown(f"_schreibt{'.' * ((i % 3) + 1)}_")
+            dots.markdown(f"<em>schreibt{'.' * ((i % 3) + 1)}</em>", unsafe_allow_html=True)
             time.sleep(0.35)
         dots.empty()
 
@@ -248,7 +247,7 @@ if user_msg:
         displayed = ""
         for ch in bot_text:
             displayed += ch
-            output.markdown(displayed)
+            output.markdown(f"<div class='bubble bot'>{displayed}</div>", unsafe_allow_html=True)
             time.sleep(random.uniform(0.01, 0.03))
 
     st.session_state.history.append(("assistant", bot_text))
