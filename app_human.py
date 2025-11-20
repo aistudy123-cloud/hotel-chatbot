@@ -152,7 +152,7 @@ main [data-testid="block-container"]{
 
 <div class="fixed-sidebox">
 """ + img_tag + """
-<h3>KI-Chatbot</h3>
+<h3>Mitarbeiter-Chat</h3>
 </div>
 """, unsafe_allow_html=True)
 
