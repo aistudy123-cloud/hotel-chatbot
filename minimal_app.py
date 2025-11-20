@@ -28,7 +28,7 @@ with header_col_c:
         unsafe_allow_html=True
     )
 with header_col_r:
-    if st.button("🧹 Neue Unterhaltung starten", key="btn_reset_top"):
+    if st.button("🧹 Unterhaltung neu starten", key="btn_reset_top"):
         st.session_state.history = []
         st.rerun()
 
@@ -58,9 +58,9 @@ line-height:1.25;
 .fixed-sidebox img{
 display:block;
 margin:2px auto 6px;
-max-width:90%;
+max-width:60%;
 height:auto;
-border-radius:12px;
+border-radius:6px;
 }
 @media (max-width:900px){
 .fixed-sidebox{display:none;}
