@@ -96,13 +96,6 @@ main [data-testid="block-container"]{
 .stButton button:hover{ filter: brightness(1.05); }
 .stButton button:active{ transform: translateY(1px); }
 
-/* Eingabefeld */
-[data-testid="stChatInput"] textarea{
-  border-radius:14px !important;
-  border:1px solid var(--border) !important;
-  background:#fff !important;
-  box-shadow: var(--shadow);
-}
 
 /* Chatblasen */
 [data-testid="stChatMessage"]{
@@ -139,7 +132,7 @@ main [data-testid="block-container"]{
 /* Fixiertes Seitenpanel */
 .fixed-sidebox{
   position:fixed;
-  top:160px;  /* tiefer wegen Header-Bild */
+  top:120px;  /* tiefer wegen Header-Bild */
   right:24px;
   width:230px;
   background:#ffffff;
