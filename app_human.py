@@ -193,7 +193,7 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 if not st.session_state.history:
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar="👩‍🦰"):
         st.write("Willkommen im Hotel! Wie kann ich helfen?")
 
 for role, text in st.session_state.history:
@@ -214,7 +214,7 @@ if user_msg:
         bot_text = best["answer"]
         picked_id = best["id"]
 
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar="👩‍🦰"):
         dots = st.empty()
         for i in range(3):
             dots.markdown(f"_schreibt{'.' * ((i % 3) + 1)}_")
