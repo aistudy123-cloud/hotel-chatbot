@@ -193,7 +193,7 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 if not st.session_state.history:
-    with st.chat_message("assistant", avatar="👩‍🦰"):
+    with st.chat_message("assistant", avatar="👩‍💼"):
         st.write("Willkommen im Hotel! Wie kann ich helfen?")
 
 for role, text in st.session_state.history:
@@ -203,7 +203,7 @@ for role, text in st.session_state.history:
 user_msg = st.chat_input("Frag mich etwas …")
 if user_msg:
     st.session_state.history.append(("user", user_msg))
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar="🧒"):
         st.write(user_msg)
 
     best, sim, top = find_best_answer(user_msg, df, vec, X, threshold=0.20, topk=3)
@@ -214,7 +214,7 @@ if user_msg:
         bot_text = best["answer"]
         picked_id = best["id"]
 
-    with st.chat_message("assistant", avatar="👩‍🦰"):
+    with st.chat_message("assistant", avatar="👩‍💼"):
         dots = st.empty()
         for i in range(3):
             dots.markdown(f"_schreibt{'.' * ((i % 3) + 1)}_")
