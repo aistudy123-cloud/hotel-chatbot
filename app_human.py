@@ -250,4 +250,16 @@ if user_msg:
     with st.chat_message("assistant", avatar="👩‍💼"):
         dots = st.empty()
         for i in range(3):
-            dots.markdown(f"<em>schreibt{'.' * ((*
+            dots.markdown(f"<em>schreibt{'.' * ((i % 3) + 1)}</em>", unsafe_allow_html=True)
+            time.sleep(0.35)
+        dots.empty()
+
+        output = st.empty()
+        displayed = ""
+        for ch in bot_text:
+            displayed += ch
+            output.markdown(f"<div class='bubble bot'>{displayed}</div>", unsafe_allow_html=True)
+            time.sleep(random.uniform(0.01, 0.03))
+
+    st.session_state.history.append(("assistant", bot_text))
+    log_event(user_msg, picked_id, sim if best is not None else 0.0)
