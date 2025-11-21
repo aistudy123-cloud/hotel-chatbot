@@ -7,7 +7,7 @@ import os, base64, time, random
 
 st.set_page_config(page_title="Mitarbeiter-Chat", page_icon="💬")
 
-# ---- Logo laden & als Base64 einbetten (vermeidet Pfad-/Serving-Probleme) ----
+# ---- Logo laden & Base64 einbetten ----
 def to_b64(path: str) -> str:
     try:
         with open(path, "rb") as f:
@@ -15,15 +15,13 @@ def to_b64(path: str) -> str:
     except Exception:
         return ""
 
-# Rechtsseitiges Chatbot-Logo
+# Logos
 LOGO_PATH = "Mitarbeiter.jpg"
 LOGO_B64 = to_b64(LOGO_PATH)
-
-# Header-Bild oben mittig
 HEADER_IMG_PATH = "bed.jpg"
 HEADER_IMG_B64 = to_b64(HEADER_IMG_PATH)
 
-# ---- Kopfbereich mit Headerbild (Banner-Stil), Titel ----
+# ---- Header-Bild oben ----
 if HEADER_IMG_B64:
     st.markdown(
         f"""
@@ -52,21 +50,17 @@ else:
         unsafe_allow_html=True
     )
 
-# ---- Fixiertes Seiten-Panel rechts ----
-# MIME-Typ an JPEG anpassen, weil LOGO_PATH .jpg ist
+# ---- Seiten-Panel rechts ----
 img_tag = f"<img src='data:image/jpeg;base64,{LOGO_B64}' alt='Chatbot Logo'>" if LOGO_B64 else ""
 st.markdown("""
 <style>
-/* ========== Design Preset: Hotel Bellevue Grand ========== */
-
-/* — Farben & Typo — */
 :root{
-  --brand:#8fd1f2;     /* Primärfarbe */
-  --brand-2:#3B6EA8;   /* Akzent */
-  --bg:#F6F7F9;        /* App-Hintergrund */
-  --card:#FFFFFF;      /* Karten / Bubbles */
-  --muted:#6B7280;     /* Sekundärtext */
-  --border:#E6E8EC;    /* Ränder */
+  --brand:#8fd1f2;
+  --brand-2:#3B6EA8;
+  --bg:#F6F7F9;
+  --card:#FFFFFF;
+  --muted:#6B7280;
+  --border:#E6E8EC;
   --shadow:0 8px 24px rgba(15,23,42,0.08);
 }
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
@@ -74,13 +68,12 @@ html, body, [data-testid="stAppViewContainer"] *{
   font-family:'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-/* — App-Layout — */
 [data-testid="stAppViewContainer"]{ background:var(--bg); }
 main [data-testid="block-container"]{
   max-width: 980px;
   padding-top: 0.5rem;
   padding-bottom: 2rem;
-  padding-right: 290px; /* Platz rechts für Sidepanel */
+  padding-right: 290px;
 }
 
 /* Buttons */
@@ -96,7 +89,7 @@ main [data-testid="block-container"]{
 .stButton button:hover{ filter: brightness(1.05); }
 .stButton button:active{ transform: translateY(1px); }
 
-/* ===== Chatblasen über eigene Klassen (robust, unabhängig von Streamlit-Interna) ===== */
+/* ===== Chatblasen ===== */
 .bubble{
   background: var(--card);
   border:1px solid var(--border);
@@ -106,16 +99,38 @@ main [data-testid="block-container"]{
   margin:0 0 .4rem 0;
   word-wrap: break-word;
 }
-
-/* User rechts, Bot links */
 .bubble.user{
   background:#FAFCFF;
   border-color:#DDE7F5;
-  margin-left:200px;   /* schiebt Richtung rechts */
+  margin-left:200px;
 }
 .bubble.bot{
   background:#FFFFFF;
-  margin-right:200px;  /* schiebt Richtung links */
+  margin-right:200px;
+}
+
+/* ===== Avatar-Positionierung ===== */
+
+/* Container flexen */
+[data-testid="stChatMessage"] > div {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+/* Avatar-Standard (Bot links) */
+[data-testid="stChatMessage"]:has(.bubble.bot) > div {
+  flex-direction: row;
+}
+
+/* Avatar-User rechts */
+[data-testid="stChatMessage"]:has(.bubble.user) > div {
+  flex-direction: row-reverse;
+}
+
+/* Avatar-Größe */
+[data-testid="stChatMessageAvatarUser"], [data-testid="stChatMessageAvatarAssistant"] {
+  flex-shrink: 0;
 }
 
 /* Scrollbar */
@@ -128,7 +143,7 @@ main [data-testid="block-container"]{
 /* Fixiertes Seitenpanel */
 .fixed-sidebox{
   position:fixed;
-  top:120px;  /* tiefer wegen Header-Bild */
+  top:120px;
   right:24px;
   width:230px;
   background:#ffffff;
@@ -154,7 +169,6 @@ main [data-testid="block-container"]{
   border-radius:12px;
 }
 
-/* Responsive: Sidepanel ausblenden und Padding zurücknehmen */
 @media (max-width: 1100px){
   main [data-testid="block-container"]{ padding-right: 0; }
 }
@@ -169,7 +183,7 @@ main [data-testid="block-container"]{
 </div>
 """, unsafe_allow_html=True)
 
-# ---- Daten laden & Helfer ----
+# ---- Daten & Logik ----
 @st.cache_resource
 def load_kb(csv_path="answers.csv"):
     df = pd.read_csv(csv_path).fillna("")
@@ -206,12 +220,12 @@ df, vec, X = load_kb("answers.csv")
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Begrüßung (als Bot-Blase)
+# Begrüßung
 if not st.session_state.history:
     with st.chat_message("assistant", avatar="👩‍💼"):
         st.markdown("<div class='bubble bot'>Willkommen im Hotel! Wie kann ich helfen?</div>", unsafe_allow_html=True)
 
-# Verlauf rendern (mit Rollenklassen)
+# Verlauf
 for role, text in st.session_state.history:
     with st.chat_message(role):
         who = "user" if role == "user" else "bot"
@@ -221,12 +235,10 @@ for role, text in st.session_state.history:
 user_msg = st.chat_input("Frag mich etwas …")
 
 if user_msg:
-    # User anzeigen (rechts)
     st.session_state.history.append(("user", user_msg))
     with st.chat_message("user", avatar="🧒"):
         st.markdown(f"<div class='bubble user'>{user_msg}</div>", unsafe_allow_html=True)
 
-    # Antwort suchen
     best, sim, top = find_best_answer(user_msg, df, vec, X, threshold=0.20, topk=3)
     if best is None:
         bot_text = "Das weiß ich leider nicht."
@@ -235,20 +247,7 @@ if user_msg:
         bot_text = best["answer"]
         picked_id = best["id"]
 
-    # Bot-Antwort streamen (links, in einer Bubble)
     with st.chat_message("assistant", avatar="👩‍💼"):
         dots = st.empty()
         for i in range(3):
-            dots.markdown(f"<em>schreibt{'.' * ((i % 3) + 1)}</em>", unsafe_allow_html=True)
-            time.sleep(0.35)
-        dots.empty()
-
-        output = st.empty()
-        displayed = ""
-        for ch in bot_text:
-            displayed += ch
-            output.markdown(f"<div class='bubble bot'>{displayed}</div>", unsafe_allow_html=True)
-            time.sleep(random.uniform(0.01, 0.03))
-
-    st.session_state.history.append(("assistant", bot_text))
-    log_event(user_msg, picked_id, sim if best is not None else 0.0)
+            dots.markdown(f"<em>schreibt{'.' * ((*
