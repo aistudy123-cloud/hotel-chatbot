@@ -30,7 +30,7 @@ HEADER_IMG_B64 = to_b64(HEADER_IMG_PATH)
 if HEADER_IMG_B64:
     st.markdown(
         f"""
-        <div style='position:relative; text-align:center; margin-top:-30px; margin-bottom:1rem;'>
+        <div style='position:relative; text-align:center; margin-top:-30px; margin-bottom:0.5rem;'>
             <img src='data:image/jpeg;base64,{HEADER_IMG_B64}'
                  alt='Hotel Header'
                  style='width:100%; max-height:180px; object-fit:cover; border-radius:0 0 20px 20px;
@@ -253,7 +253,7 @@ for role, text in st.session_state.history:
 user_msg = st.chat_input("Frag mich etwas …")
 if user_msg:
     st.session_state.history.append(("user", user_msg))
-    with st.chat_message("user", avatar="🧒"):
+    with st.chat_message("user"):
         st.write(user_msg)
 
     best, sim, top = find_best_answer(user_msg, df, vec, X, threshold=0.30, topk=3)
@@ -264,7 +264,7 @@ if user_msg:
         bot_text = best["answer"]
         picked_id = best["id"]
 
-    with st.chat_message("assistant", avatar="🤖"):
+    with st.chat_message("assistant"):
         dots = st.empty()
         for i in range(3):
             dots.markdown(f"_schreibt{'.' * ((i % 3) + 1)}_")
@@ -323,6 +323,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
