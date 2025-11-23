@@ -151,6 +151,7 @@ main [data-testid="block-container"]{
 
 <div class="fixed-sidebox">
 """ + img_tag + """
+<p style='margin:0; font-weight:600; font-size:14px;'>Sarah</p>
 <h3>Mitarbeiter-Chat</h3>
 </div>
 """, unsafe_allow_html=True)
@@ -323,5 +324,6 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
