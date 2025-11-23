@@ -272,7 +272,7 @@ if user_msg:
         dots.empty()
 
         output = st.empty()
-   #    displayed = ""
+        displayed = ""
    #    for ch in bot_text:
    #        displayed += ch
    #        output.markdown(displayed)
@@ -323,6 +323,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
