@@ -30,10 +30,10 @@ HEADER_IMG_B64 = to_b64(HEADER_IMG_PATH)
 if HEADER_IMG_B64:
     st.markdown(
         f"""
-        <div style='position:relative; text-align:center; margin-top:-20px; margin-bottom:1rem;'>
+        <div style='position:relative; text-align:center; margin-top:-30px; margin-bottom:1rem;'>
             <img src='data:image/jpeg;base64,{HEADER_IMG_B64}'
                  alt='Hotel Header'
-                 style='width:100%; max-height:200px; object-fit:cover; border-radius:0 0 20px 20px;
+                 style='width:100%; max-height:180px; object-fit:cover; border-radius:0 0 20px 20px;
                         box-shadow:0 4px 14px rgba(0,0,0,0.15);'>
             <div style='position:absolute; bottom:25px; left:0; width:100%; text-align:center; color:white;
                         text-shadow:0 2px 6px rgba(0,0,0,0.5);'>
@@ -152,6 +152,7 @@ main [data-testid="block-container"]{
 
 <div class="fixed-sidebox">
 """ + img_tag + """
+<p style='margin:0; font-weight:600; font-size:14px;'>Chatino</p>
 <h3>KI-Chatbot</h3>
 </div>
 """, unsafe_allow_html=True)
@@ -242,8 +243,8 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 if not st.session_state.history:
-    with st.chat_message("assistant", avatar="🤖"):
-        st.write("Willkommen im Hotel! Wie kann ich helfen?")
+    with st.chat_message("assistant"):
+        st.write("Willkommen im Hotel! Ich bin ein KI-Chatbot und stehe Ihnen jederzeit gerne für Fragen oder Anliegen rund um Ihren Aufenthalt zur Verfügung. Wie kann ich helfen?")
 
 for role, text in st.session_state.history:
     with st.chat_message(role):
@@ -322,6 +323,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
