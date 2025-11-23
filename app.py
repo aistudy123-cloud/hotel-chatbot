@@ -86,7 +86,7 @@ html, body, [data-testid="stAppViewContainer"] *{
 [data-testid="stAppViewContainer"]{ background:var(--bg); }
 main [data-testid="block-container"]{
   max-width: 980px;
-  padding-top: 0.5rem;
+  padding-top: 0rem;
   padding-bottom: 2rem;
   padding-right: 290px; /* Platz rechts für Sidepanel */
 }
@@ -322,6 +322,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
