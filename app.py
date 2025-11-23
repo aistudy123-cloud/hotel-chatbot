@@ -242,13 +242,60 @@ df, vec, X = load_kb("answers.csv")
 if "history" not in st.session_state:
     st.session_state.history = []
 
-if not st.session_state.history:
-    with st.chat_message("assistant"):
-        st.write("Willkommen im Hotel! Ich bin ein KI-Chatbot und stehe Ihnen jederzeit gerne für Fragen oder Anliegen rund um Ihren Aufenthalt zur Verfügung. Wie kann ich helfen?")
+# ---- Initiale Begrüßung (bleibt immer stehen) ----
+if "greeting_shown" not in st.session_state:
+    st.session_state.greeting_shown = True
+    st.session_state.history = [("assistant", "Willkommen im Hotel! Ich bin ein KI-Chatbot und stehe Ihnen jederzeit gerne für Fragen oder Anliegen rund um Ihren Aufenthalt zur Verfügung. Wie kann ich helfen?")]
+elif "history" not in st.session_state:
+    st.session_state.history = []
 
+# ---- Verlauf anzeigen ----
 for role, text in st.session_state.history:
     with st.chat_message(role):
         st.write(text)
+
+# ---- Eingabe ----
+user_msg = st.chat_input("Frag mich etwas …")
+
+if user_msg:
+    st.session_state.history.append(("user", user_msg))
+    with st.chat_message("user"):
+        st.write(user_msg)
+
+    best, sim, top = find_best_answer(user_msg, df, vec, X, threshold=0.30, topk=3)
+    if best is None:
+        bot_text = "Das weiß ich leider nicht."
+        picked_id = ""
+    else:
+        bot_text = best["answer"]
+        picked_id = best["id"]
+
+    # ---- Chatbot-Antwort mit Tippanimation ----
+    with st.chat_message("assistant"):
+        dots = st.empty()
+        for i in range(3):
+            dots.markdown(f"_schreibt{'.' * ((i % 3) + 1)}_")
+            time.sleep(0.35)
+        dots.empty()
+
+        output = st.empty()
+        displayed = ""
+        for ch in bot_text:
+            displayed += ch
+            output.markdown(displayed)
+            time.sleep(random.uniform(0.01, 0.03))
+
+    # Hier wichtig: Placeholder löschen, um Duplikate zu verhindern
+    output.empty()
+
+    # Antwort dauerhaft zur History hinzufügen
+    st.session_state.history.append(("assistant", bot_text))
+
+    # Logging
+    log_event(user_msg, picked_id, sim if best is not None else 0.0)
+
+    # Kein st.rerun() nötig → Begrüßung bleibt stehen
+
 
 user_msg = st.chat_input("Frag mich etwas …")
 if user_msg:
@@ -325,6 +372,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
