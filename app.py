@@ -30,7 +30,7 @@ HEADER_IMG_B64 = to_b64(HEADER_IMG_PATH)
 if HEADER_IMG_B64:
     st.markdown(
         f"""
-        <div style='position:relative; text-align:center; margin-bottom:1.5rem;'>
+        <div style='position:relative; text-align:center; margin-top:-20px; margin-bottom:1.5rem;'>
             <img src='data:image/jpeg;base64,{HEADER_IMG_B64}'
                  alt='Hotel Header'
                  style='width:100%; max-height:200px; object-fit:cover; border-radius:0 0 20px 20px;
@@ -322,6 +322,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
