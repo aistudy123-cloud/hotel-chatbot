@@ -277,7 +277,7 @@ if user_msg:
             displayed += ch
             output.markdown(displayed)
             time.sleep(random.uniform(0.01, 0.03))
-        output.markdown(bot_text)
+#      output.markdown(bot_text)
         
     st.session_state.history.append(("assistant", bot_text))
 #    st.rerun()
@@ -325,6 +325,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
