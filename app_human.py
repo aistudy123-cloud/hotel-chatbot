@@ -229,7 +229,7 @@ def log_event(user_text, picked_id, sim, logfile="logs.csv"):
     exists = os.path.exists(logfile)
     pd.DataFrame([row]).to_csv(logfile, mode="a", index=False, header=not exists)
 
- session_id = st.session_state.get("session_id", "")
+session_id = st.session_state.get("session_id", "")
     try:
         log_event_to_gsheet(ts, user_text, picked_id, sim, session_id=session_id)
     except Exception as e:
@@ -323,3 +323,4 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
