@@ -30,10 +30,10 @@ HEADER_IMG_B64 = to_b64(HEADER_IMG_PATH)
 if HEADER_IMG_B64:
     st.markdown(
         f"""
-         <div style='position:relative; text-align:center; margin-top:-20px; margin-bottom:1rem;'>
+         <div style='position:relative; text-align:center; margin-top:-30px; margin-bottom:0.5rem;'>
             <img src='data:image/jpeg;base64,{HEADER_IMG_B64}'
                  alt='Hotel Header'
-                 style='width:100%; max-height:200px; object-fit:cover; border-radius:0 0 20px 20px;
+                 style='width:100%; max-height:180px; object-fit:cover; border-radius:0 0 20px 20px;
                         box-shadow:0 4px 14px rgba(0,0,0,0.15);'>
             <div style='position:absolute; bottom:25px; left:0; width:100%; text-align:center; color:white;
                         text-shadow:0 2px 6px rgba(0,0,0,0.5);'>
@@ -242,18 +242,24 @@ df, vec, X = load_kb("answers.csv")
 if "history" not in st.session_state:
     st.session_state.history = []
 
-if not st.session_state.history:
-    with st.chat_message("assistant", avatar="👩‍💼"):
-        st.write("Willkommen im Hotel! Mein Name ist Sarah. Wie kann ich helfen?")
+# ---- Initiale Begrüßung (bleibt immer stehen) ----
+if "greeting_shown" not in st.session_state:
+    st.session_state.greeting_shown = True
+    st.session_state.history = [("assistant", "Willkommen im Hotel! Ich bin Sarah und stehe Ihnen jederzeit gerne für Fragen oder Anliegen rund um Ihren Aufenthalt zur Verfügung. Wie kann ich helfen?")]
+elif "history" not in st.session_state:
+    st.session_state.history = []
 
+# ---- Verlauf anzeigen ----
 for role, text in st.session_state.history:
     with st.chat_message(role):
         st.write(text)
 
+# ---- Eingabe ----
 user_msg = st.chat_input("Frag mich etwas …")
+
 if user_msg:
     st.session_state.history.append(("user", user_msg))
-    with st.chat_message("user", avatar="🧒"):
+    with st.chat_message("user"):
         st.write(user_msg)
 
     best, sim, top = find_best_answer(user_msg, df, vec, X, threshold=0.30, topk=3)
@@ -264,7 +270,8 @@ if user_msg:
         bot_text = best["answer"]
         picked_id = best["id"]
 
-    with st.chat_message("assistant", avatar="👩‍💼"):
+    # ---- Chatbot-Antwort mit Tippanimation ----
+    with st.chat_message("assistant", avatar="Human-Icon.png"):
         dots = st.empty()
         for i in range(3):
             dots.markdown(f"_schreibt{'.' * ((i % 3) + 1)}_")
@@ -278,8 +285,17 @@ if user_msg:
             output.markdown(displayed)
             time.sleep(random.uniform(0.01, 0.03))
 
+    # Hier wichtig: Placeholder löschen, um Duplikate zu verhindern
+    output.empty()
+
+    # Antwort dauerhaft zur History hinzufügen
     st.session_state.history.append(("assistant", bot_text))
+
+    # Logging
     log_event(user_msg, picked_id, sim if best is not None else 0.0)
+
+    # Kein st.rerun() nötig → Begrüßung bleibt stehen
+    st.rerun()
 
 import gspread
 from google.oauth2.service_account import Credentials
@@ -324,6 +340,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
