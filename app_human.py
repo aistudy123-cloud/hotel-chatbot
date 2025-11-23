@@ -30,10 +30,10 @@ HEADER_IMG_B64 = to_b64(HEADER_IMG_PATH)
 if HEADER_IMG_B64:
     st.markdown(
         f"""
-        <div style='position:relative; text-align:center; margin-bottom:1.5rem;'>
+         <div style='position:relative; text-align:center; margin-top:-20px; margin-bottom:1rem;'>
             <img src='data:image/jpeg;base64,{HEADER_IMG_B64}'
                  alt='Hotel Header'
-                 style='width:100%; max-height:280px; object-fit:cover; border-radius:0 0 20px 20px;
+                 style='width:100%; max-height:200px; object-fit:cover; border-radius:0 0 20px 20px;
                         box-shadow:0 4px 14px rgba(0,0,0,0.15);'>
             <div style='position:absolute; bottom:25px; left:0; width:100%; text-align:center; color:white;
                         text-shadow:0 2px 6px rgba(0,0,0,0.5);'>
@@ -86,7 +86,7 @@ html, body, [data-testid="stAppViewContainer"] *{
 [data-testid="stAppViewContainer"]{ background:var(--bg); }
 main [data-testid="block-container"]{
   max-width: 980px;
-  padding-top: 0.5rem;
+  padding-top: 0rem;
   padding-bottom: 2rem;
   padding-right: 290px; /* Platz rechts für Sidepanel */
 }
@@ -324,6 +324,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
