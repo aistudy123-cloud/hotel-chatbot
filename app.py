@@ -219,6 +219,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
 
 
 def log_event(user_text, picked_id, sim, logfile="logs.csv"):
+    ts = datetime.utcnow().isoformat()
     row = {
         "timestamp": datetime.utcnow().isoformat(),
         "user_text": user_text,
@@ -321,6 +322,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
