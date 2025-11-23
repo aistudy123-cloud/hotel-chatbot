@@ -297,38 +297,6 @@ if user_msg:
     # Kein st.rerun() nötig → Begrüßung bleibt stehen
 
 
-user_msg = st.chat_input("Frag mich etwas …")
-if user_msg:
-    st.session_state.history.append(("user", user_msg))
-    with st.chat_message("user"):
-        st.write(user_msg)
-
-    best, sim, top = find_best_answer(user_msg, df, vec, X, threshold=0.30, topk=3)
-    if best is None:
-        bot_text = "Das weiß ich leider nicht."
-        picked_id = ""
-    else:
-        bot_text = best["answer"]
-        picked_id = best["id"]
-
-    with st.chat_message("assistant"):
-        dots = st.empty()
-        for i in range(3):
-            dots.markdown(f"_schreibt{'.' * ((i % 3) + 1)}_")
-            time.sleep(0.35)
-        dots.empty()
-
-        output = st.empty()
-        displayed = ""
-        for ch in bot_text:
-            displayed += ch
-            output.markdown(displayed)
-            time.sleep(random.uniform(0.01, 0.03))
-        output.empty()
-        
-    st.session_state.history.append(("assistant", bot_text))
-    st.rerun()
-    log_event(user_msg, picked_id, sim if best is not None else 0.0)
 import gspread
 from google.oauth2.service_account import Credentials
 
@@ -372,6 +340,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
