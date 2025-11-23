@@ -166,7 +166,7 @@ def load_kb(csv_path="answers.csv"):
     X = vec.fit_transform(df["question"].tolist())
     return df, vec, X
 
-def find_best_answer(user_text, df, vec, X, threshold=0.20, topk=3):
+def find_best_answer(user_text, df, vec, X, threshold=0.30, topk=3):
     q = vec.transform([user_text])
     sims = cosine_similarity(q, X).flatten()
     best_idx = int(sims.argmax())
@@ -255,7 +255,7 @@ if user_msg:
     with st.chat_message("user", avatar="🧒"):
         st.write(user_msg)
 
-    best, sim, top = find_best_answer(user_msg, df, vec, X, threshold=0.20, topk=3)
+    best, sim, top = find_best_answer(user_msg, df, vec, X, threshold=0.30, topk=3)
     if best is None:
         bot_text = "Das weiß ich leider nicht."
         picked_id = ""
@@ -322,6 +322,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
