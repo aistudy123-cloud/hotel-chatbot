@@ -177,6 +177,47 @@ def find_best_answer(user_text, df, vec, X, threshold=0.20, topk=3):
     top = [(df.iloc[i]["id"], df.iloc[i]["question"], float(sims[i])) for i in top_idx]
     return df.iloc[best_idx], best_sim, top
 
+import gspread
+from google.oauth2.service_account import Credentials
+
+# Scopes: Sheets lesen/schreiben + Drive lesen (für open_by_…)
+_SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive.readonly"
+]
+
+@st.cache_resource(show_spinner=False)
+def _get_gsheet_client():
+    creds = Credentials.from_service_account_info(
+        st.secrets["gcp_service_account"],
+        scopes=_SCOPES
+    )
+    return gspread.authorize(creds)
+
+@st.cache_resource(show_spinner=False)
+def _open_worksheet():
+    gc = _get_gsheet_client()
+    ss_conf = st.secrets["sheets"]
+    # Öffnen per Name ODER per ID (falls in secrets gesetzt)
+    if "spreadsheet_id" in ss_conf and ss_conf["spreadsheet_id"]:
+        sh = gc.open_by_key(ss_conf["spreadsheet_id"])
+    else:
+        sh = gc.open(ss_conf["spreadsheet_name"])
+    try:
+        ws = sh.worksheet(ss_conf.get("worksheet_name", "Logs"))
+    except gspread.WorksheetNotFound:
+        # Falls Blatt nicht existiert: anlegen und Header setzen
+        ws = sh.add_worksheet(title=ss_conf.get("worksheet_name", "Logs"), rows="1000", cols="10")
+        ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
+    return ws
+
+def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, similarity: float, session_id: str | None = None):
+    """Schreibt ein Log-Event in Google Sheets."""
+    ws = _open_worksheet()
+    row = [timestamp_iso, user_text, picked_id, similarity, session_id or ""]
+    ws.append_row(row, value_input_option="USER_ENTERED")
+
+
 def log_event(user_text, picked_id, sim, logfile="logs.csv"):
     row = {
         "timestamp": datetime.utcnow().isoformat(),
@@ -280,5 +321,6 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
