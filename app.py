@@ -245,7 +245,7 @@ if "history" not in st.session_state:
 # ---- Initiale Begrüßung (bleibt immer stehen) ----
 if "greeting_shown" not in st.session_state:
     st.session_state.greeting_shown = True
-    st.session_state.history = [("assistant", "Willkommen im Hotel! Ich bin ein KI-Chatbot und stehe Ihnen jederzeit gerne für Fragen oder Anliegen rund um Ihren Aufenthalt zur Verfügung. Wie kann ich helfen?")]
+    st.session_state.history = [("assistant", "Willkommen im Hotel! Ich bin Chatino, ein KI-Chatbot, und stehe Ihnen jederzeit gerne für Fragen oder Anliegen rund um Ihren Aufenthalt zur Verfügung. Wie kann ich helfen?")]
 elif "history" not in st.session_state:
     st.session_state.history = []
 
@@ -340,6 +340,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
