@@ -264,7 +264,7 @@ user_msg = st.chat_input("Frag mich etwas …")
 
 if user_msg:
     st.session_state.history.append(("user", user_msg))
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar="User-Icon.png"):
         st.write(user_msg)
 
     best, sim, top = find_best_answer(user_msg, df, vec, X, threshold=0.30, topk=3)
@@ -345,6 +345,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
