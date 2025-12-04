@@ -251,8 +251,13 @@ elif "history" not in st.session_state:
 
 # ---- Verlauf anzeigen ----
 for role, text in st.session_state.history:
-    with st.chat_message(role):
-        st.write(text)
+    if role == "assistant":
+        with st.chat_message("assistant"):
+            st.write(text)
+    else:
+        with st.chat_message("user"):
+            st.write(text)
+
 
 # ---- Eingabe ----
 user_msg = st.chat_input("Frag mich etwas …")
@@ -340,6 +345,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
