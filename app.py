@@ -252,7 +252,7 @@ elif "history" not in st.session_state:
 # ---- Verlauf anzeigen ----
 for role, text in st.session_state.history:
     if role == "assistant":
-        with st.chat_message("assistant"):
+        with st.chat_message("assistant", avatar="AI-Icon.png"):
             st.write(text)
     else:
         with st.chat_message("user"):
@@ -276,7 +276,7 @@ if user_msg:
         picked_id = best["id"]
 
     # ---- Chatbot-Antwort mit Tippanimation ----
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar="AI-Icon.png"):
         dots = st.empty()
         for i in range(3):
             dots.markdown(f"_schreibt{'.' * ((i % 3) + 1)}_")
@@ -345,6 +345,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
