@@ -255,7 +255,7 @@ for role, text in st.session_state.history:
         with st.chat_message("assistant", avatar="Human-Icon.png"):
             st.write(text)
     else:
-        with st.chat_message(role):
+        with st.chat_message("user", avatar="User-Icon.png"):
             st.write(text)
 
 # ---- Eingabe ----
@@ -344,6 +344,7 @@ def log_event_to_gsheet(timestamp_iso: str, user_text: str, picked_id: str, simi
         # ws.update("A1:E1", [["timestamp", "user_text", "picked_id", "similarity", "session_id"]])
         row.append(session_id)
     ws.append_row(row, value_input_option="USER_ENTERED")
+
 
 
 
